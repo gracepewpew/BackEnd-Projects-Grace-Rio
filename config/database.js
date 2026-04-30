@@ -3,7 +3,7 @@ const mysql = require('mysql2/promise');
 const dbConfig = {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
+    password: process.env.DB_PASSWORD || '0pipinLoopyme030new',
     database: process.env.DB_NAME || 'amoxicillin_health',
     waitForConnections: true,
     connectionLimit: 10,
@@ -21,14 +21,23 @@ async function getConnection() {
 
 async function initializeDatabase() {
     try {
-        const connection = await getConnection();
+        // First create connection without database to create it
+        const mysql = require('mysql2/promise');
+        const connection = await mysql.createConnection({
+            host: dbConfig.host,
+            user: dbConfig.user,
+            password: dbConfig.password
+        });
 
         // Create database if it doesn't exist
-        await connection.execute('CREATE DATABASE IF NOT EXISTS amoxicillin_health');
-        await connection.execute('USE amoxicillin_health');
+        await connection.query('CREATE DATABASE IF NOT EXISTS amoxicillin_health');
+        await connection.end();
 
-        // Create users table
-        await connection.execute(`
+        // Now get the pool for the actual database
+        const pool = await getConnection();
+
+        // Create tables
+        await pool.query(`
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
@@ -42,8 +51,7 @@ async function initializeDatabase() {
             )
         `);
 
-        // Create health_records table
-        await connection.execute(`
+        await pool.query(`
             CREATE TABLE IF NOT EXISTS health_records (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
@@ -59,8 +67,7 @@ async function initializeDatabase() {
             )
         `);
 
-        // Create medicines table
-        await connection.execute(`
+        await pool.query(`
             CREATE TABLE IF NOT EXISTS medicines (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
@@ -71,8 +78,7 @@ async function initializeDatabase() {
             )
         `);
 
-        // Create inquiries table
-        await connection.execute(`
+        await pool.query(`
             CREATE TABLE IF NOT EXISTS inquiries (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 patientId INT,
@@ -85,8 +91,7 @@ async function initializeDatabase() {
             )
         `);
 
-        // Create kunjungan (visits) table
-        await connection.execute(`
+        await pool.query(`
             CREATE TABLE IF NOT EXISTS kunjungan (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 patientId INT,
@@ -101,8 +106,7 @@ async function initializeDatabase() {
             )
         `);
 
-        // Create adjustments table
-        await connection.execute(`
+        await pool.query(`
             CREATE TABLE IF NOT EXISTS adjustments (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 medicineId INT,
@@ -117,42 +121,42 @@ async function initializeDatabase() {
         `);
 
         // Insert seed data
-        await insertSeedData(connection);
+        await insertSeedData(pool);
 
-        console.log('Database initialized successfully');
+        console.log('✅ Database initialized successfully');
         return true;
     } catch (error) {
         console.error('Database initialization error:', error.message);
         console.log('⚠️  MySQL not available. Application will run in demo mode with JSON files.');
         console.log('To enable full functionality:');
-        console.log('1. Install MySQL Server');
-        console.log('2. Create database: CREATE DATABASE amoxicillin_health;');
-        console.log('3. Run migration script: mysql -u root amoxicillin_health < database_migration.sql');
+        console.log('1. Ensure MySQL Server is running');
+        console.log('2. Database will be created automatically on first run');
         return false;
     }
 }
 
-async function insertSeedData(connection) {
+async function insertSeedData(pool) {
     try {
         // Insert sample users
-        await connection.execute(`
+        await pool.query(`
             INSERT IGNORE INTO users (name, email, phone, role, password, doctorId, ktp) VALUES
             ('Boi', 'dadas@gmail.com', '08123456789', 'doctor', 'terserah', '135246', NULL),
             ('Boi', 'dummy1@gmail.com', '08123456789', 'doctor', 'helloworld', '135246', NULL),
-            ('Emily', 'Emily@gmail.com', '081111111111', 'patient', 'whatever', NULL, '123456789')
+            ('Emily', 'Emily@gmail.com', '081111111111', 'patient', 'whatever', NULL, '123456789'),
+            ('Gpw', 'grace.wijaya2@gmail.com', '082161231919', 'patient', '123456', NULL, '210289200202')
         `);
 
         // Insert sample medicines
-        await connection.execute(`
+        await pool.query(`
             INSERT IGNORE INTO medicines (name, description, stock, unit) VALUES
             ('Amoxicillin 500mg', 'Antibiotic for bacterial infections', 100, 'capsules'),
             ('Paracetamol 500mg', 'Pain reliever and fever reducer', 200, 'tablets'),
             ('Ibuprofen 400mg', 'Anti-inflammatory pain reliever', 150, 'tablets')
         `);
 
-        console.log('Seed data inserted successfully');
+        console.log('✅ Seed data inserted successfully');
     } catch (error) {
-        console.log('Seed data insertion skipped (may already exist)');
+        console.log('ℹ️  Seed data insertion skipped (may already exist)');
     }
 }
 

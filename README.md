@@ -1,49 +1,47 @@
 # Amoxicillin - Smart Health Management System
 
-## 📋 Project Information
 
-**Course:** Pengembangan Web Back-End (13.BEWD.301)  
-**Theme:** Smart Health  
-**Team Members:**
-- Student 1: [Your Name] - NIM: [Your NIM]
-- Student 2: [Team Member Name] - NIM: [Team Member NIM]
-- Student 3: [Team Member Name] - NIM: [Team Member NIM]
+Course: Pengembangan Web Back-End
+Theme: Smart Health  
+Team Members:
+- Rio Frederich - 211112075
+- Grace Putri Wijaya - 211110121
 
-## 🚀 Installation & Setup
+Installation & Setup
 
-### Prerequisites
+Prerequisites
 - Node.js (v14 or higher)
 - MySQL Server
 - Git
 
-### Installation Steps
+Installation Steps
 
-1. **Clone the repository:**
+1. Clone the repository:
    ```bash
    git clone [your-github-repo-url]
    cd Amoxicillin
    ```
 
-2. **Install dependencies:**
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-3. **Setup MySQL Database:**
+3. Setup MySQL Database:
    - Install MySQL Server on your system
    - Create a database named `amoxicillin_health`
    - Update database credentials in `config/database.js` if needed
 
-4. **Start the server:**
+4. Start the server:
    ```bash
    npm start
    ```
 
-5. **Access the application:**
+5. Access the application:
    - Frontend: http://localhost:3000
    - API Base URL: http://localhost:3000
 
-## 🏗️ Project Structure
+ 🏗️ Project Structure
 
 ```
 Amoxicillin/
@@ -69,23 +67,23 @@ Amoxicillin/
 └── README.md               # This file
 ```
 
-## 👥 Test Accounts
+Test Accounts
 
-### Admin/Doctor Accounts
-- **Email:** dadas@gmail.com | **Password:** terserah | **Role:** doctor
-- **Email:** dummy1@gmail.com | **Password:** helloworld | **Role:** doctor
+Admin/Doctor Accounts
+- Email: dadas@gmail.com | Password: terserah | Role: doctor
+- Email: dummy1@gmail.com | Password: helloworld | Role: doctor
 
-### Patient Accounts
-- **Email:** Emily@gmail.com | **Password:** whatever | **Role:** patient
+Patient Accounts
+- Email: Emily@gmail.com | Password: whatever | Role: patient
 
-## 📚 API Documentation
+API Documentation
 
-### Authentication Endpoints
+Authentication Endpoints
 
-#### POST /auth/register
+ POST /auth/register
 Register a new user.
 
-**Request Body:**
+Request Body:
 ```json
 {
   "name": "John Doe",
@@ -97,7 +95,7 @@ Register a new user.
 }
 ```
 
-**Response (201):**
+Response (201):
 ```json
 {
   "message": "Registrasi berhasil",
@@ -110,10 +108,10 @@ Register a new user.
 }
 ```
 
-#### POST /auth/login
+ POST /auth/login
 Login user.
 
-**Request Body:**
+Request Body:
 ```json
 {
   "email": "john@example.com",
@@ -122,7 +120,7 @@ Login user.
 }
 ```
 
-**Response (200):**
+Response (200):
 ```json
 {
   "message": "Login berhasil",
@@ -136,15 +134,15 @@ Login user.
 }
 ```
 
-#### GET /auth/profile
+ GET /auth/profile
 Get user profile (requires authentication).
 
-**Headers:**
+Headers:
 ```
 Authorization: Bearer <token>
 ```
 
-**Response (200):**
+Response (200):
 ```json
 {
   "user": {
@@ -159,12 +157,12 @@ Authorization: Bearer <token>
 }
 ```
 
-### Health Records Endpoints
+Health Records Endpoints
 
-#### GET /health
+ GET /health
 Get all health records with pagination and filtering.
 
-**Query Parameters:**
+Query Parameters:
 - `page` (number): Page number (default: 1)
 - `limit` (number): Items per page (default: 10)
 - `category` (string): Filter by BMI category (Kurus, Normal, Gemuk, Obesitas)
@@ -172,9 +170,9 @@ Get all health records with pagination and filtering.
 - `maxAge` (number): Maximum age filter
 - `userId` (number): Filter by user ID
 
-**Example:** `/health?page=1&limit=5&category=Normal`
+Example: `/health?page=1&limit=5&category=Normal`
 
-**Response (200):**
+Response (200):
 ```json
 {
   "data": [
@@ -200,10 +198,10 @@ Get all health records with pagination and filtering.
 }
 ```
 
-#### POST /health
+ POST /health
 Create new health record.
 
-**Request Body:**
+Request Body:
 ```json
 {
   "name": "John Doe",
@@ -214,46 +212,46 @@ Create new health record.
 }
 ```
 
-#### GET /health/:id
+ GET /health/:id
 Get specific health record.
 
-#### PUT /health/:id
+ PUT /health/:id
 Update health record.
 
-#### DELETE /health/:id
+ DELETE /health/:id
 Delete health record.
 
-### Error Response Format
+Error Response Format
 
-**Validation Error (400):**
+Validation Error (400):
 ```json
 {
   "message": "Semua field wajib diisi"
 }
 ```
 
-**Not Found (404):**
+Not Found (404):
 ```json
 {
   "message": "Data tidak ditemukan"
 }
 ```
 
-**Server Error (500):**
+Server Error (500):
 ```json
 {
   "message": "Terjadi kesalahan server"
 }
 ```
 
-## 🛠️ Technologies Used
+Technologies Used
 
-- **Backend:** Node.js, Express.js
-- **Database:** MySQL
-- **Frontend:** HTML, CSS, JavaScript
-- **Architecture:** RESTful API with MVC pattern
+- Backend: Node.js, Express.js
+- Database: MySQL
+- Frontend: HTML, CSS, JavaScript
+- Architecture: RESTful API with MVC pattern
 
-## 🔧 Key Features
+Key Features
 
 - ✅ User Authentication & Authorization
 - ✅ Health Records Management (BMI Calculator)
@@ -264,7 +262,7 @@ Delete health record.
 - ✅ Responsive Frontend
 - ✅ Error Handling & Validation
 
-## 📝 Development Notes
+Development Notes
 
 - Database automatically initializes on first run
 - Password hashing should be implemented in production
@@ -272,11 +270,7 @@ Delete health record.
 - All routes include proper error handling
 - Frontend uses vanilla JavaScript for simplicity
 
-## 🎥 Demo Video
+Demo Video
 
-[Link to 15-minute demo video on OneDrive/Google Drive]
+[Link Placeholder]
 
----
-
-**Note:** This project fulfills all UTS requirements including database integration, CRUD operations, pagination, filtering, and comprehensive documentation.</content>
-<parameter name="filePath">/Users/stream/Downloads/Amoxicillin(25)/README.md
