@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profil Saya - Amoxicillin Health System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2 class="logo">💊 Amoxicillin</h2>
+
+        <div class="user-info">
+            <p id="userName">User</p>
+            <p id="userRole" class="user-role">Pasien</p>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 15px 0;">
+
+        <div class="menu">
+            <p class="menu-title">Menu</p>
+            <a href="patient-dashboard.html">🏠 Beranda</a>
+            <a href="patient-request-kunjungan.html">📅 Minta Kunjungan</a>
+            <a href="patient-health-records.html">📋 Riwayat Kesehatan</a>
+        </div>
+
+        <div class="menu">
+            <p class="menu-title">Profil</p>
+            <a href="patient-profile.html">👤 Profil Saya</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <h1>Profil Pasien</h1>
+
+        <div class="card">
+            <h3>Data Pribadi</h3>
+
+            <div class="form-grid">
+                <div>
+                    <label>Nama Lengkap:</label>
+                    <input type="text" id="name" readonly style="background-color: #f1f2f6;">
+                </div>
+                <div>
+                    <label>No. KTP/ID:</label>
+                    <input type="text" id="ktp" readonly style="background-color: #f1f2f6;">
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div>
+                    <label>Email:</label>
+                    <input type="email" id="email" readonly style="background-color: #f1f2f6;">
+                </div>
+                <div>
+                    <label>No. HP:</label>
+                    <input type="tel" id="phone" readonly style="background-color: #f1f2f6;">
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div>
+                    <label>Tanggal Daftar:</label>
+                    <input type="text" id="createdAt" readonly style="background-color: #f1f2f6;">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Keamanan Akun</h3>
+            <button class="btn-primary" onclick="changePassword()">Ubah Password</button>
+        </div>
+
+        <div class="card">
+            <h3>Status Kunjungan Terbaru</h3>
+            <div id="latestKunjungan">
+                <p style="color: #999;">Belum ada riwayat kunjungan. Ajukan permintaan untuk melihat status di sini.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script for auth check -->
+    <script src="script-auth.js"></script>
+    <script src="script-patient-profile.js"></script>
+
+</body>
+</html>

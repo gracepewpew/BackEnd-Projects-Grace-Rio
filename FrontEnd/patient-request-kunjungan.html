@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minta Kunjungan - Amoxicillin Health System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2 class="logo">💊 Amoxicillin</h2>
+
+        <div class="user-info">
+            <p id="userName">User</p>
+            <p id="userRole" class="user-role">Pasien</p>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 15px 0;">
+
+        <div class="menu">
+            <p class="menu-title">Menu</p>
+            <a href="patient-dashboard.html">🏠 Beranda</a>
+            <a href="patient-request-kunjungan.html">📅 Minta Kunjungan</a>
+            <a href="patient-health-records.html">📋 Riwayat Kesehatan</a>
+        </div>
+
+        <div class="menu">
+            <p class="menu-title">Profil</p>
+            <a href="patient-profile.html">👤 Profil Saya</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <h1>Minta Kunjungan Dokter</h1>
+
+        <!-- FORM -->
+        <div class="card">
+            <h3>Form Permintaan Kunjungan</h3>
+
+            <div class="form-grid">
+                <div>
+                    <label for="tanggalRequest">Tanggal Diinginkan:</label>
+                    <input type="date" id="tanggalRequest">
+                </div>
+                <div>
+                    <label for="jenisLayanan">Jenis Layanan:</label>
+                    <select id="jenisLayanan">
+                        <option value="">-- Pilih Jenis Layanan --</option>
+                        <option value="Konsultasi">Konsultasi</option>
+                        <option value="Pemeriksaan">Pemeriksaan</option>
+                        <option value="Vaksinasi">Vaksinasi</option>
+                        <option value="Follow-up">Follow-up</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-item">
+                <label for="keluhan">Keluhan/Gejala:</label>
+                <textarea id="keluhan" placeholder="Jelaskan keluhan Anda..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; min-height: 100px;"></textarea>
+            </div>
+
+            <div class="form-buttons">
+                <button class="btn-primary" onclick="submitRequest()">Kirim Permintaan</button>
+                <button class="btn-cancel" onclick="resetForm()">Reset</button>
+            </div>
+        </div>
+
+        <!-- SEARCH -->
+        <div class="search-bar">
+            <input type="text" id="searchRequest" placeholder="Cari permintaan kunjungan...">
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No. Permintaan</th>
+                        <th>Tanggal Diinginkan</th>
+                        <th>Jenis Layanan</th>
+                        <th>Keluhan</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody id="requestTable">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- Script for auth check -->
+    <script src="script-auth.js"></script>
+    <script src="script-patient-request.js"></script>
+
+</body>
+</html>

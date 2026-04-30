@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Amoxicillin Health System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="auth-style.css">
+</head>
+<body class="auth-body">
+
+<!-- AUTH CONTAINER -->
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1 class="auth-logo">💊 Amoxicillin</h1>
+            <p class="auth-subtitle">Health Management System</p>
+        </div>
+
+        <form id="loginForm" class="auth-form">
+            <h2>Login</h2>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="masukkan email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="masukkan password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="role">Role</label>
+                <select id="role" name="role" required>
+                    <option value="">-- Pilih Role --</option>
+                    <option value="doctor">Dokter</option>
+                    <option value="patient">Pasien</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-login">Login</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Belum punya akun? <a href="register.html">Daftar di sini</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- Script -->
+<script src="script-login.js"></script>
+
+</body>
+</html>

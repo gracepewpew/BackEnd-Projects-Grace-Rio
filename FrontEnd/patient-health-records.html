@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Riwayat Kesehatan - Amoxicillin Health System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2 class="logo">💊 Amoxicillin</h2>
+
+        <div class="user-info">
+            <p id="userName">User</p>
+            <p id="userRole" class="user-role">Pasien</p>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 15px 0;">
+
+        <div class="menu">
+            <p class="menu-title">Menu</p>
+            <a href="patient-dashboard.html">🏠 Beranda</a>
+            <a href="patient-request-kunjungan.html">📅 Minta Kunjungan</a>
+            <a href="patient-health-records.html">📋 Riwayat Kesehatan</a>
+        </div>
+
+        <div class="menu">
+            <p class="menu-title">Profil</p>
+            <a href="patient-profile.html">👤 Profil Saya</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <h1>Riwayat Kesehatan</h1>
+
+        <!-- SEARCH -->
+        <div class="search-bar">
+            <input type="text" id="searchRecords" placeholder="Cari berdasarkan gejala atau tanggal...">
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tanggal Konsultasi</th>
+                        <th>Keluhan</th>
+                        <th>Catatan Dokter</th>
+                        <th>Diagnosis</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody id="recordsTable">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- Script for auth check -->
+    <script src="script-auth.js"></script>
+    <script src="script-patient-records.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Dashboard - Amoxicillin Health System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2 class="logo">💊 Amoxicillin</h2>
+
+        <div class="user-info">
+            <p id="userName">User</p>
+            <p id="userRole" class="user-role">Pasien</p>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 15px 0;">
+
+        <div class="menu">
+            <p class="menu-title">Menu</p>
+            <a href="patient-dashboard.html">🏠 Beranda</a>
+            <a href="patient-request-kunjungan.html">📅 Minta Kunjungan</a>
+            <a href="patient-health-records.html">📋 Riwayat Kesehatan</a>
+        </div>
+
+        <div class="menu">
+            <p class="menu-title">Profil</p>
+            <a href="patient-profile.html">👤 Profil Saya</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <h1>Dashboard Pasien</h1>
+
+        <div class="card">
+            <h2>Selamat Datang 👋</h2>
+            <p id="welcomeMessage">Halo, Pasien! Selamat datang di Amoxicillin Health System.</p>
+        </div>
+
+        <div class="card">
+            <h2>Layanan Tersedia</h2>
+            <ul style="line-height: 1.8;">
+                <li>📅 <strong>Minta Kunjungan Dokter</strong> - Ajukan permintaan kunjungan kesehatan</li>
+                <li>📋 <strong>Riwayat Kesehatan</strong> - Lihat catatan dokter dan diagnosa</li>
+                <li>👤 <strong>Profil</strong> - Kelola data pribadi Anda</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Panduan Kesehatan</h2>
+            <p>Baca info menarik tentang perawatan kesehatan di rumah.</p>
+            <div class="info-box-grid">
+                <div class="info-box" onclick="showEducation('handwash')">
+                    <h3>🧼 Cuci Tangan</h3>
+                    <p>Cara mencuci tangan yang benar untuk mencegah infeksi.</p>
+                </div>
+                <div class="info-box" onclick="showEducation('mask')">
+                    <h3>😷 Masker Penting</h3>
+                    <p>Kenapa masker membantu melindungi diri dan orang lain.</p>
+                </div>
+                <div class="info-box" onclick="showEducation('nutrition')">
+                    <h3>🥗 Gizi Seimbang</h3>
+                    <p>Vitamin, buah, dan protein yang perlu pasien konsumsi.</p>
+                </div>
+                <div class="info-box" onclick="showEducation('basics')">
+                    <h3>🛌 Perawatan Dasar</h3>
+                    <p>Tips sederhana untuk merawat diri saat di rumah sakit.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal" id="educationModal" aria-hidden="true" role="dialog" aria-labelledby="educationTitle">
+        <div class="modal-content">
+            <span class="close" onclick="closeEducation()">&times;</span>
+            <h2 id="educationTitle"></h2>
+            <div id="educationContent"></div>
+        </div>
+    </div>
+
+    <!-- Script for auth check -->
+    <script src="script-auth.js"></script>
+    <script src="script-patient-dashboard.js"></script>
+
+</body>
+</html>

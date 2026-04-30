@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1775702704479,
+    "name": "Budi",
+    "age": 21,
+    "height": 170,
+    "weight": 65,
+    "createdAt": "2026-04-09T02:45:04.479Z"
+  },
+  {
+    "id": 1775704639175,
+    "name": "Rio",
+    "age": 23,
+    "height": 170,
+    "weight": 82,
+    "bmi": "28.37",
+    "category": "Gemuk",
+    "createdAt": "2026-04-09T03:17:19.175Z"
+  },
+  {
+    "id": 1775705524897,
+    "name": "Grace",
+    "age": 23,
+    "height": 165,
+    "weight": 60,
+    "bmi": "22.04",
+    "category": "Normal",
+    "createdAt": "2026-04-09T03:32:04.897Z"
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "name": "Boi",
+    "email": "dadas@gmail.com",
+    "phone": "08123456789",
+    "role": "doctor",
+    "password": "terserah",
+    "createdAt": "2026-04-22T08:16:11.130Z",
+    "doctorId": "135246"
+  },
+  {
+    "id": 2,
+    "name": "Boi",
+    "email": "dummy1@gmail.com",
+    "phone": "08123456789",
+    "role": "doctor",
+    "password": "helloworld",
+    "createdAt": "2026-04-22T08:17:52.826Z",
+    "doctorId": "135246"
+  },
+  {
+    "id": 3,
+    "name": "Emily",
+    "email": "Emily@gmail.com",
+    "phone": "081111111111",
+    "role": "patient",
+    "password": "whatever",
+    "createdAt": "2026-04-22T08:19:25.131Z",
+    "ktp": "123456789"
+  },
+  {
+    "id": 4,
+    "name": "Gpw",
+    "email": "grace.wijaya2@gmail.com",
+    "phone": "082161231919",
+    "role": "patient",
+    "password": "123456",
+    "createdAt": "2026-04-30T06:26:16.975Z",
+    "ktp": "210289200202"
+  }
+]

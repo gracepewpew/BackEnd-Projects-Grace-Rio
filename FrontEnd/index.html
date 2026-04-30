@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Amoxicillin Health System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2 class="logo">💊 Amoxicillin</h2>
+        <div class="user-info">
+            <p id="userName">User</p>
+            <p id="userRole" class="user-role">Role</p>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 15px 0;">
+        <div class="menu">
+            <p class="menu-title">Daftar</p>
+            <a href="#">🧑‍⚕️ Daftar Pasien</a>
+            <a href="dokter.html">👨‍⚕️ Daftar Dokter</a>
+            <a href="suster.html">👩‍⚕️ Daftar Suster</a>
+        </div>
+
+        <div class="menu">
+            <p class="menu-title">Aktivitas</p>
+            <a href="inquiry.html">🔍 Inquiry Pasien</a>
+            <a href="kunjungan.html">🏥 Permintaan Kunjungan</a>
+        </div>
+
+        <div class="menu">
+            <p class="menu-title">Persediaan</p>
+            <a href="persediaan.html">📦 Daftar Persediaan</a>
+            <a href="adjust.html">🔄 Adjust Persediaan</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <h1>Dashboard</h1>
+
+        <div class="card">
+            <h2>Selamat Datang 👋</h2>
+            <p>Ini adalah Amoxicillin Health System.</p>
+        </div>
+
+        <div class="card">
+            <h2>Info</h2>
+            <p>Silakan pilih menu di sidebar untuk mulai menggunakan sistem.</p>
+        </div>
+    </div>
+
+    <!-- Script for auth check -->
+    <script src="script-auth.js"></script>
+
+</body>
+</html>

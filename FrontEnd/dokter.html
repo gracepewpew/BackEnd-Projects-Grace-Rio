@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Dokter - Amoxicillin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2 class="logo">💊 Amoxicillin</h2>
+
+        <div class="user-info">
+            <p id="userName">User</p>
+            <p id="userRole" class="user-role">Role</p>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 15px 0;">
+
+        <!-- Daftar Menu -->
+        <nav class="menu">
+            <p class="menu-title">Daftar</p>
+            <a href="index.html">🧑‍⚕️ Daftar Pasien</a>
+            <a href="dokter.html">👨‍⚕️ Daftar Dokter</a>
+            <a href="suster.html">👩‍⚕️ Daftar Suster</a>
+        </nav>
+
+        <!-- Aktivitas Menu -->
+        <nav class="menu">
+            <p class="menu-title">Aktivitas</p>
+            <a href="inquiry.html">🔍 Inquiry Pasien</a>
+            <a href="kunjungan.html">🏥 Permintaan Kunjungan</a>
+        </nav>
+
+        <!-- Persediaan Menu -->
+        <nav class="menu">
+            <p class="menu-title">Persediaan</p>
+            <a href="persediaan.html">📦 Daftar Persediaan</a>
+            <a href="adjust.html">🔄 Adjust Persediaan</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1>Data Dokter</h1>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <button class="btn-primary" id="addDoctorBtn">+ Tambah Dokter</button>
+            <div class="search-bar">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Cari nama, spesialis, jabatan..."
+                />
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nama Dokter</th>
+                        <th>Spesialis</th>
+                        <th>Jabatan</th>
+                        <th>Jenis Kelamin</th>
+                        <th>No. Telepon</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="doctorTable">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal for Add/Edit (hidden by default) -->
+    <div id="doctorModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2 id="modalTitle">Tambah Dokter</h2>
+            
+            <form id="doctorForm">
+                <label for="name">Nama Dokter:</label>
+                <input type="text" id="name" required>
+                
+                <label for="specialty">Spesialis:</label>
+                <select id="specialty" required>
+                    <option value="">-- Pilih --</option>
+                    <option value="Umum">Umum</option>
+                    <option value="Gigi">Gigi</option>
+                    <option value="Mata">Mata</option>
+                    <option value="THT">THT</option>
+                    <option value="Jantung">Jantung</option>
+                    <option value="Paru-paru">Paru-paru</option>
+                    <option value="Ortopedi">Ortopedi</option>
+                    <option value="Saraf">Saraf</option>
+                </select>
+                
+                <label for="position">Jabatan:</label>
+                <select id="position" required>
+                    <option value="">-- Pilih --</option>
+                    <option value="Dokter Spesialis">Dokter Spesialis</option>
+                    <option value="Dokter Umum">Dokter Umum</option>
+                    <option value="Praktikan">Praktikan</option>
+                    <option value="Residen">Residen</option>
+                </select>
+                
+                <label for="gender">Jenis Kelamin:</label>
+                <select id="gender" required>
+                    <option value="">-- Pilih --</option>
+                    <option value="Laki-laki">Laki-laki</option>
+                    <option value="Perempuan">Perempuan</option>
+                </select>
+                
+                <label for="phone">No. Telepon:</label>
+                <input type="tel" id="phone" pattern="^\+62[0-9]{9,12}$" placeholder="Nomor telepon diawali dengan +62" required>
+                
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+                
+                <label for="status">Status:</label>
+                <select id="status" required>
+                    <option value="">-- Pilih --</option>
+                    <option value="Aktif">Aktif</option>
+                    <option value="Tidak Aktif">Tidak Aktif</option>
+                </select>
+                
+                <div class="form-buttons">
+                    <button type="submit" class="btn-primary">Simpan</button>
+                    <button type="button" class="btn-cancel" id="cancelBtn">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script-auth.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

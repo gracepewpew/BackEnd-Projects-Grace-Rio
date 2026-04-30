@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inquiry Pasien</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2 class="logo">💊 Amoxicillin</h2>
+
+    <div class="user-info">
+        <p id="userName">User</p>
+        <p id="userRole" class="user-role">Role</p>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+
+    <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 15px 0;">
+
+    <div class="menu">
+        <p class="menu-title">Daftar</p>
+        <a href="index.html">🧑‍⚕️ Daftar Pasien</a>
+        <a href="dokter.html">👨‍⚕️ Daftar Dokter</a>
+        <a href="suster.html">👩‍⚕️ Daftar Suster</a>
+    </div>
+
+    <div class="menu">
+        <p class="menu-title">Aktivitas</p>
+        <a href="inquiry.html">🔍 Inquiry Pasien</a>
+        <a href="kunjungan.html">🏥 Permintaan Kunjungan</a>
+    </div>
+
+    <div class="menu">
+        <p class="menu-title">Persediaan</p>
+        <a href="persediaan.html">📦 Daftar Persediaan</a>
+        <a href="adjust.html">🔄 Adjust Persediaan</a>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <h1>Inquiry Pasien</h1>
+
+    <!-- SEARCH -->
+    <div class="search-bar">
+        <input type="text" id="searchInquiry" placeholder="Cari nama pasien atau nomor...">
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama Pasien</th>
+                    <th>No. KTP/ID</th>
+                    <th>No. HP</th>
+                    <th>Email</th>
+                    <th>Keluhan</th>
+                    <th>Tanggal Inquiry</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody id="inquiryTable">
+                <!-- Data will be populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- Script -->
+<script src="script-auth.js"></script>
+<script src="script-inquiry.js"></script>
+
+</body>
+</html>

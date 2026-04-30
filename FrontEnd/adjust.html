@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Adjust Persediaan</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2 class="logo">💊 Amoxicillin</h2>
+
+    <div class="user-info">
+        <p id="userName">User</p>
+        <p id="userRole" class="user-role">Role</p>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+
+    <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 15px 0;">
+
+    <div class="menu">
+        <p class="menu-title">Daftar</p>
+        <a href="index.html">🧑‍⚕️ Daftar Pasien</a>
+        <a href="dokter.html">👨‍⚕️ Daftar Dokter</a>
+        <a href="suster.html">👩‍⚕️ Daftar Suster</a>
+    </div>
+
+    <div class="menu">
+        <p class="menu-title">Aktivitas</p>
+        <a href="inquiry.html">🔍 Inquiry Pasien</a>
+        <a href="kunjungan.html">🏥 Permintaan Kunjungan</a>
+    </div>
+
+    <div class="menu">
+        <p class="menu-title">Persediaan</p>
+        <a href="persediaan.html">📦 Daftar Persediaan</a>
+        <a href="adjust.html">🔄 Adjust Persediaan</a>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-content">
+
+    <h1>Adjust Persediaan</h1>
+
+    <div class="card">
+
+        <!-- FORM HEADER -->
+        <div class="form-grid">
+            <div>
+                <label for="noBukti">No. Bukti:</label>
+                <input type="text" id="noBukti" readonly>
+            </div>
+            <div>
+                <label for="tanggal">Tanggal:</label>
+                <input type="date" id="tanggal">
+            </div>
+            <div>
+                <label for="tipeAdjust">Tipe:</label>
+                <select id="tipeAdjust">
+                    <option value="IN">IN (Masuk)</option>
+                    <option value="OUT">OUT (Keluar)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- BARANG -->
+        <h3>Barang</h3>
+
+        <div id="barangContainer">
+            <!-- Rows will be added by JavaScript -->
+        </div>
+
+        <br>
+
+        <div class="form-buttons">
+            <button type="button" class="btn-primary" id="addRowBtn">+ Tambah Barang</button>
+            <button type="button" class="btn-primary" id="simpanBtn">Simpan</button>
+            <button type="button" class="btn-cancel" id="resetBtn">Reset Counter</button>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Script -->
+<script src="script-auth.js"></script>
+<script src="script-adjust.js"></script>
+
+</body>
+</html>
