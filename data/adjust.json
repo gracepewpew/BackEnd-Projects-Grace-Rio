@@ -1,1 +1,58 @@
-[]
+[
+  {
+    "id": 1,
+    "noBukti": "0001",
+    "tanggal": "2026-05-01",
+    "tipe": "IN",
+    "items": [
+      {
+        "nama": "OBH",
+        "qty": "5",
+        "satuan": "Botol"
+      }
+    ],
+    "createdAt": "2026-05-01T03:52:17.239Z"
+  },
+  {
+    "id": 2,
+    "noBukti": "0002",
+    "tanggal": "2026-05-01",
+    "tipe": "IN",
+    "items": [
+      {
+        "nama": "Paracetamol",
+        "qty": "100",
+        "satuan": "Tablet"
+      }
+    ],
+    "createdAt": "2026-05-01T03:52:47.085Z"
+  },
+  {
+    "id": 3,
+    "noBukti": "0003",
+    "tanggal": "2026-05-01",
+    "tipe": "IN",
+    "items": [
+      {
+        "nama": "Paracetamol",
+        "qty": "50",
+        "satuan": "Tablet"
+      }
+    ],
+    "createdAt": "2026-05-01T03:53:01.025Z"
+  },
+  {
+    "id": 4,
+    "noBukti": "0004",
+    "tanggal": "2026-05-01",
+    "tipe": "IN",
+    "items": [
+      {
+        "nama": "Paracetamol",
+        "qty": "50",
+        "satuan": "Tablet"
+      }
+    ],
+    "createdAt": "2026-05-01T04:27:04.723Z"
+  }
+]

@@ -72,7 +72,6 @@ function renderKunjungans(data) {
                 <td>${item.noKunjungan}</td>
                 <td>${item.namaPasien}</td>
                 <td>${item.noHp}</td>
-                <td>${item.alamat}</td>
                 <td>${item.jenisLayanan}</td>
                 <td>${item.tanggalKunjungan}</td>
                 <td><span class="status ${statusClass}">${item.status}</span></td>
@@ -107,11 +106,11 @@ async function simpanKunjungan() {
     const tanggalKunjungan = document.getElementById("tanggalKunjungan").value;
     const namaPasien = document.getElementById("namaPasienKunjungan").value;
     const noHp = document.getElementById("noHpKunjungan").value;
-    const alamat = document.getElementById("alamat").value;
+
     const jenisLayanan = document.getElementById("jenisLayanan").value;
     const status = document.getElementById("statusKunjungan").value;
 
-    if (!noKunjungan || !tanggalKunjungan || !namaPasien || !noHp || !alamat || !jenisLayanan || !status) {
+    if (!noKunjungan || !tanggalKunjungan || !namaPasien || !noHp || !jenisLayanan || !status) {
         alert("Semua field harus diisi!");
         return;
     }
@@ -121,7 +120,6 @@ async function simpanKunjungan() {
         tanggalKunjungan,
         namaPasien,
         noHp,
-        alamat,
         jenisLayanan,
         status
     };
@@ -157,7 +155,6 @@ function resetForm() {
     document.getElementById("tanggalKunjungan").value = "";
     document.getElementById("namaPasienKunjungan").value = "";
     document.getElementById("noHpKunjungan").value = "";
-    document.getElementById("alamat").value = "";
     document.getElementById("jenisLayanan").value = "";
     document.getElementById("statusKunjungan").value = "";
 }

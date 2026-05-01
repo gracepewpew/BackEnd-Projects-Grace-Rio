@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "id": 1,
+    "name": "Amoxicillin 500mg",
+    "description": "Antibiotic for bacterial infections",
+    "stock": 100,
+    "unit": "capsules",
+    "createdAt": "2026-04-30T00:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "name": "Paracetamol 500mg",
+    "description": "Pain reliever and fever reducer",
+    "stock": 200,
+    "unit": "tablets",
+    "createdAt": "2026-04-30T00:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "name": "Ibuprofen 400mg",
+    "description": "Anti-inflammatory pain reliever",
+    "stock": 150,
+    "unit": "tablets",
+    "createdAt": "2026-04-30T00:00:00.000Z"
+  }
+]

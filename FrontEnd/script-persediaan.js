@@ -8,7 +8,6 @@ const searchInput = document.getElementById("searchObat");
 // =======================
 document.addEventListener("DOMContentLoaded", () => {
     loadMedicines();
-    setupImageModal();
     setActiveMenu();
 
     if (searchInput) {
@@ -25,8 +24,8 @@ async function loadMedicines() {
 
         if (!response.ok) throw new Error("Failed to load medicines");
 
-        const data = await response.json();
-        renderMedicines(data);
+        const result = await response.json();
+        renderMedicines(result.data); // Access the data array
 
     } catch (error) {
         console.error("Error:", error);
@@ -41,29 +40,34 @@ function renderMedicines(data) {
     obatTable.innerHTML = "";
 
     data.forEach(item => {
+        // Map API fields to frontend expected fields
+        const nama = item.name || "Unknown";
+        const jenis = item.description || "Unknown";
+        const stok = item.stock || 0;
+        const satuan = item.unit || "Unknown";
+        const expired = "2025-12-31"; // Default expiry date since API doesn't provide
+        const reserve = "2025-12-31"; // Default reserve date since API doesn't provide
+        const status = stok > 50 ? "Tersedia" : stok > 10 ? "Terbatas" : "Habis";
 
         const statusClass =
-            item.status === "Tersedia" ? "aktif" :
-            item.status === "Terbatas" ? "terbatas" : "nonaktif";
+            status === "Tersedia" ? "aktif" :
+            status === "Terbatas" ? "terbatas" : "nonaktif";
 
         const row = `
             <tr>
                 <td>
                     <div class="obat-info">
-                        <img 
-                            src="${item.image || '../images/default.png'}"
-                            class="obat-img"
-                            onclick="expandImage(this)"
-                        >
-                        <span>${item.nama}</span>
+                        <span>${nama}</span>
                     </div>
                 </td>
-                <td>${item.jenis}</td>
-                <td>${item.stok}</td>
-                <td>${item.satuan}</td>
-                <td class="expired-date">${item.expired}</td>
-                <td class="reserve-date">${item.reserve}</td>
-                <td class="status-cell"></td>
+                <td>${jenis}</td>
+                <td>${stok}</td>
+                <td>${satuan}</td>
+                <td class="expired-date">${expired}</td>
+                <td class="reserve-date">${reserve}</td>
+                <td class="status-cell">
+                    <span class="status-label ${statusClass}">${status}</span>
+                </td>
                 <td>
                     <button class="btn-edit" onclick="editMedicine(${item.id})">Edit</button>
                     <button class="btn-delete" onclick="deleteMedicine(${item.id})">Hapus</button>
@@ -156,33 +160,80 @@ async function deleteMedicine(id) {
 }
 
 // =======================
-// IMAGE MODAL (KEEP 🔥)
+// EDIT
 // =======================
-function setupImageModal() {
-    const modal = document.createElement("div");
-    modal.id = "imageModal";
-    modal.innerHTML = `
-        <span id="closeModal">&times;</span>
-        <img id="modalImg">
+async function editMedicine(id) {
+    // Find the medicine data from the current table
+    const row = document.querySelector(`button[onclick="editMedicine(${id})"]`).closest('tr');
+    const cells = row.querySelectorAll('td');
+
+    const currentData = {
+        name: cells[0].textContent.trim(),
+        description: cells[1].textContent.trim(),
+        stock: parseInt(cells[2].textContent.trim()),
+        unit: cells[3].textContent.trim()
+    };
+
+    // Create edit form
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+        <td><input type="text" value="${currentData.name}" id="edit-name-${id}"></td>
+        <td><input type="text" value="${currentData.description}" id="edit-description-${id}"></td>
+        <td><input type="number" value="${currentData.stock}" id="edit-stock-${id}"></td>
+        <td><input type="text" value="${currentData.unit}" id="edit-unit-${id}"></td>
+        <td colspan="4">
+            <button class="btn-primary" onclick="saveEdit(${id})">Simpan</button>
+            <button class="btn-secondary" onclick="cancelEdit(${id})">Batal</button>
+        </td>
     `;
 
-    document.body.appendChild(modal);
-
-    document.getElementById("closeModal").onclick = () => {
-        modal.style.display = "none";
-    };
-
-    modal.onclick = () => {
-        modal.style.display = "none";
-    };
+    // Replace the current row with edit form
+    row.parentNode.replaceChild(newRow, row);
 }
 
-function expandImage(img) {
-    const modal = document.getElementById("imageModal");
-    const modalImg = document.getElementById("modalImg");
+// =======================
+// SAVE EDIT
+// =======================
+async function saveEdit(id) {
+    const name = document.getElementById(`edit-name-${id}`).value.trim();
+    const description = document.getElementById(`edit-description-${id}`).value.trim();
+    const stock = parseInt(document.getElementById(`edit-stock-${id}`).value);
+    const unit = document.getElementById(`edit-unit-${id}`).value.trim();
 
-    modal.style.display = "flex";
-    modalImg.src = img.src;
+    if (!name || isNaN(stock)) {
+        alert("Nama dan stok harus diisi dengan benar!");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name,
+                description,
+                stock,
+                unit
+            })
+        });
+
+        if (!response.ok) throw new Error("Update gagal");
+
+        loadMedicines(); // Reload the table
+
+    } catch (error) {
+        console.error(error);
+        alert("Gagal mengupdate obat.");
+    }
+}
+
+// =======================
+// CANCEL EDIT
+// =======================
+function cancelEdit(id) {
+    loadMedicines(); // Simply reload to cancel edit
 }
 
 // =======================

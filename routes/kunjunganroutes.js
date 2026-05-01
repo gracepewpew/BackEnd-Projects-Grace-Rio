@@ -1,9 +1,20 @@
 const express = require("express");
 const fs = require("fs").promises;
 const path = require("path");
+const { getConnection } = require("../config/database");
 
 const router = express.Router();
 const DATA_PATH = path.join(__dirname, "..", "data", "kunjungan.json");
+
+// Flag to track database availability
+let dbAvailable = false;
+
+// Check database availability
+getConnection().then(() => {
+    dbAvailable = true;
+}).catch(() => {
+    dbAvailable = false;
+});
 
 /**
  * Baca data kunjungan dari file JSON asinkronus.
@@ -29,12 +40,48 @@ async function writeKunjunganData(data) {
 /**
  * GET semua kunjungan
  */
-router.get("/", (request, response) => {
-    readKunjunganData().then(data => {
-        response.status(200).json(data);
-    }).catch(error => {
+router.get("/", async (request, response) => {
+    try {
+        const kunjunganData = await readKunjunganData();
+
+        if (dbAvailable) {
+            // Fetch phone numbers from users table
+            const connection = await getConnection();
+            const enrichedData = await Promise.all(
+                kunjunganData.map(async (item) => {
+                    try {
+                        const [users] = await connection.execute(
+                            'SELECT phone FROM users WHERE name = ?',
+                            [item.namaPasien]
+                        );
+                        const phone = users.length > 0 ? users[0].phone : 'Tidak tersedia';
+                        return {
+                            ...item,
+                            noHp: phone,
+                            alamat: '-' // Remove alamat as requested
+                        };
+                    } catch (error) {
+                        return {
+                            ...item,
+                            noHp: 'Tidak tersedia',
+                            alamat: '-'
+                        };
+                    }
+                })
+            );
+            response.status(200).json(enrichedData);
+        } else {
+            // Fallback to JSON with default values
+            const enrichedData = kunjunganData.map(item => ({
+                ...item,
+                noHp: 'Tidak tersedia',
+                alamat: '-'
+            }));
+            response.status(200).json(enrichedData);
+        }
+    } catch (error) {
         response.status(500).json({ message: error.message });
-    });
+    }
 });
 
 /**
@@ -59,9 +106,12 @@ router.get("/:id", (request, response) => {
  * POST tambah kunjungan baru
  */
 router.post("/", (request, response) => {
-    const { noKunjungan, tanggalKunjungan, namaPasien, noHp, alamat, jenisLayanan, status } = request.body;
+    const { noKunjungan, tanggalKunjungan, namaPasien, jenisLayanan, keluhan, status } = request.body;
 
-    if (!noKunjungan || !tanggalKunjungan || !namaPasien || !noHp || !alamat || !jenisLayanan || !status) {
+    console.log("Received kunjungan data:", request.body);
+
+    if (!noKunjungan || !tanggalKunjungan || !namaPasien || !jenisLayanan || !status) {
+        console.log("Validation failed. Fields:", { noKunjungan, tanggalKunjungan, namaPasien, jenisLayanan, status });
         return response.status(400).json({ message: "Semua field harus diisi" });
     }
 
@@ -72,9 +122,8 @@ router.post("/", (request, response) => {
             noKunjungan,
             tanggalKunjungan,
             namaPasien,
-            noHp,
-            alamat,
             jenisLayanan,
+            keluhan: keluhan || "-",
             status
         };
 

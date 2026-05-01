@@ -67,7 +67,7 @@ function renderRequests(data) {
                 <td>${item.noKunjungan}</td>
                 <td>${item.tanggalKunjungan}</td>
                 <td>${item.jenisLayanan}</td>
-                <td>${item.jenisLayanan === "Konsultasi" ? "Konsultasi" : "Lihat Detail"}</td>
+                <td>${item.keluhan || "-"}</td>
                 <td><span class="status ${statusClass}">${item.status}</span></td>
                 <td>
                     <button class="btn-delete" onclick="cancelRequest(${item.id})">Batal</button>
@@ -84,12 +84,22 @@ function renderRequests(data) {
 // =======================
 async function submitRequest() {
     const user = JSON.parse(localStorage.getItem("user"));
-    const tanggalRequest = document.getElementById("tanggalRequest").value;
-    const jenisLayanan = document.getElementById("jenisLayanan").value;
-    const keluhan = document.getElementById("keluhan").value;
+    const tanggalRequest = document.getElementById("tanggalRequest").value.trim();
+    const jenisLayanan = document.getElementById("jenisLayanan").value.trim();
+    const keluhan = document.getElementById("keluhan").value.trim();
 
-    if (!tanggalRequest || !jenisLayanan || !keluhan) {
-        alert("Semua field harus diisi!");
+    if (!user || !user.name) {
+        alert("Akun tidak valid. Silakan logout dan login kembali.");
+        return;
+    }
+
+    const missingFields = [];
+    if (!tanggalRequest) missingFields.push("Tanggal Diinginkan");
+    if (!jenisLayanan) missingFields.push("Jenis Layanan");
+    if (!keluhan) missingFields.push("Keluhan/Gejala");
+
+    if (missingFields.length > 0) {
+        alert("Field berikut harus diisi: " + missingFields.join(", ") + ".");
         return;
     }
 
@@ -101,9 +111,8 @@ async function submitRequest() {
         noKunjungan,
         tanggalKunjungan: tanggalRequest,
         namaPasien: user.name,
-        noHp: user.phone || "",
-        alamat: "Patient Address",
         jenisLayanan,
+        keluhan,
         status: "Pending"
     };
 
@@ -114,7 +123,8 @@ async function submitRequest() {
             body: JSON.stringify(data)
         });
 
-        if (!response.ok) throw new Error("Gagal kirim");
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || "Gagal kirim");
 
         // Update counter
         localStorage.setItem("patientKunjunganCounter", (parseInt(counter) + 1).toString());
@@ -125,7 +135,7 @@ async function submitRequest() {
 
     } catch (error) {
         console.error(error);
-        alert("Gagal mengirim permintaan.");
+        alert("Gagal mengirim permintaan. " + (error.message || "Silakan coba lagi."));
     }
 }
 

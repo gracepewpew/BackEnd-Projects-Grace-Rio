@@ -98,7 +98,10 @@ router.post("/register", async (request, response) => {
                     id: result.insertId,
                     name,
                     email,
-                    role
+                    phone,
+                    role,
+                    ...(role === "doctor" && { doctorId: doctorId || null }),
+                    ...(role === "patient" && { ktp: ktp || null })
                 }
             });
         } else {
@@ -134,7 +137,10 @@ router.post("/register", async (request, response) => {
                     id: newUser.id,
                     name: newUser.name,
                     email: newUser.email,
-                    role: newUser.role
+                    phone: newUser.phone,
+                    role: newUser.role,
+                    ...(newUser.role === "doctor" && { doctorId: newUser.doctorId }),
+                    ...(newUser.role === "patient" && { ktp: newUser.ktp })
                 }
             });
         }
@@ -187,7 +193,10 @@ router.post("/login", async (request, response) => {
                     id: user.id,
                     name: user.name,
                     email: user.email,
-                    role: user.role
+                    phone: user.phone,
+                    role: user.role,
+                    ...(user.role === 'doctor' && { doctorId: user.doctorId }),
+                    ...(user.role === 'patient' && { ktp: user.ktp })
                 }
             });
         } else {
@@ -216,7 +225,10 @@ router.post("/login", async (request, response) => {
                     id: user.id,
                     name: user.name,
                     email: user.email,
-                    role: user.role
+                    phone: user.phone,
+                    role: user.role,
+                    ...(user.role === 'doctor' && { doctorId: user.doctorId }),
+                    ...(user.role === 'patient' && { ktp: user.ktp })
                 }
             });
         }

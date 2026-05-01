@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Persediaan</title>
+</head>
+<body>
+    <h1>Test Persediaan Loading</h1>
+    <div id="test-output"></div>
+
+    <script>
+        const API_URL = "http://localhost:3000/medicines";
+
+        async function testLoadMedicines() {
+            const output = document.getElementById('test-output');
+            try {
+                output.innerHTML = "Loading medicines...";
+                const response = await fetch(API_URL);
+
+                if (!response.ok) throw new Error("Failed to load medicines");
+
+                const result = await response.json();
+                const medicines = result.data;
+
+                output.innerHTML = `<h2>Loaded ${medicines.length} medicines:</h2>`;
+                medicines.forEach(item => {
+                    const nama = item.name || "Unknown";
+                    const jenis = item.description || "Unknown";
+                    const stok = item.stock || 0;
+                    const satuan = item.unit || "Unknown";
+                    const status = stok > 50 ? "Tersedia" : stok > 10 ? "Terbatas" : "Habis";
+
+                    output.innerHTML += `
+                        <div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
+                            <strong>${nama}</strong><br>
+                            Jenis: ${jenis}<br>
+                            Stok: ${stok} ${satuan}<br>
+                            Status: ${status}
+                        </div>
+                    `;
+                });
+
+            } catch (error) {
+                console.error("Error:", error);
+                output.innerHTML = "Error: " + error.message;
+            }
+        }
+
+        // Run test when page loads
+        testLoadMedicines();
+    </script>
+</body>
+</html>

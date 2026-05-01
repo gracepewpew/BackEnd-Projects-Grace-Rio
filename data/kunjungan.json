@@ -1,1 +1,38 @@
-[]
+[
+  {
+    "id": 1,
+    "noKunjungan": "PKJ-0001",
+    "tanggalKunjungan": "2026-05-19",
+    "namaPasien": "Gpw",
+    "jenisLayanan": "Pemeriksaan",
+    "keluhan": "Aduh",
+    "status": "Pending"
+  },
+  {
+    "id": 2,
+    "noKunjungan": "PKJ-0002",
+    "tanggalKunjungan": "2026-05-08",
+    "namaPasien": "Gpw",
+    "jenisLayanan": "Vaksinasi",
+    "keluhan": "cepat balas saya dok",
+    "status": "Pending"
+  },
+  {
+    "id": 3,
+    "noKunjungan": "PKJ-0003",
+    "tanggalKunjungan": "2026-05-02",
+    "namaPasien": "Emily",
+    "jenisLayanan": "Follow-up",
+    "keluhan": "tolong dok",
+    "status": "Pending"
+  },
+  {
+    "id": 4,
+    "noKunjungan": "PKJ-0004",
+    "tanggalKunjungan": "2026-05-04",
+    "namaPasien": "Gpw",
+    "jenisLayanan": "Vaksinasi",
+    "keluhan": "sakitttt",
+    "status": "Pending"
+  }
+]

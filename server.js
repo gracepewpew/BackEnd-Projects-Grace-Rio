@@ -7,7 +7,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); 
+app.use(express.urlencoded({ extended: true }));
+
+// Request logging middleware
+app.use((req, res, next) => {
+    if (req.method === "POST" || req.method === "PUT") {
+        console.log(`${req.method} ${req.path}`, req.body);
+    }
+    next();
+});
 
 // Serve static files from FrontEnd folder
 const frontEndPath = path.join(__dirname, "FrontEnd");
@@ -43,10 +51,6 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
-});
-
-app.listen(PORT, () => {
-    console.log(`Server berjalan di http://localhost:${PORT}`);
 });
 
 // Initialize database and start server

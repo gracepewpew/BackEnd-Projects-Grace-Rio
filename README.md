@@ -271,6 +271,4 @@ Development Notes
 - Frontend uses vanilla JavaScript for simplicity
 
 Demo Video
-
-[Link Placeholder]
-
+https://drive.google.com/file/d/1sFvU4JkggA2ynHDqK-_xWJf86equeVqr/view?usp=sharing

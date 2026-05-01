@@ -94,15 +94,14 @@ async function initializeDatabase() {
         await pool.query(`
             CREATE TABLE IF NOT EXISTS kunjungan (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                patientId INT,
-                doctorId INT,
-                diagnosis TEXT,
-                prescription TEXT,
-                visitDate DATETIME NOT NULL,
-                status ENUM('scheduled', 'completed', 'cancelled') DEFAULT 'scheduled',
+                noKunjungan VARCHAR(50) UNIQUE NOT NULL,
+                tanggalKunjungan DATE NOT NULL,
+                namaPasien VARCHAR(255) NOT NULL,
+                jenisLayanan VARCHAR(100),
+                keluhan TEXT,
+                status VARCHAR(50) DEFAULT 'Pending',
                 createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (patientId) REFERENCES users(id) ON DELETE CASCADE,
-                FOREIGN KEY (doctorId) REFERENCES users(id) ON DELETE CASCADE
+                FOREIGN KEY (namaPasien) REFERENCES users(name) ON DELETE CASCADE
             )
         `);
 
