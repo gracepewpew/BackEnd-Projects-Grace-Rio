@@ -1,79 +1,72 @@
-const express = require("express");
-const fs = require("fs");
-const path = require("path");
-const { initializeDatabase } = require("./config/database");
+require('dotenv').config();
+const path = require('path');
+const http = require('http');
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const swaggerUi = require('swagger-ui-express');
+
+const ensureDatabase = require('./src/config/ensureDatabase');
+const { sequelize } = require('./src/models');
+const apiRoutes = require('./src/routes');
+const errorHandler = require('./src/middleware/errorHandler');
+const seedInitialData = require('./src/utils/seed');
+const swaggerDocument = require('./src/docs/swagger');
+const { initSocket } = require('./src/socket');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const server = http.createServer(app);
+const PORT = process.env.PORT || 8888;
 
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors());
+app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Request logging middleware
-app.use((req, res, next) => {
-    if (req.method === "POST" || req.method === "PUT") {
-        console.log(`${req.method} ${req.path}`, req.body);
-    }
-    next();
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 150,
+  message: { message: 'Terlalu banyak request. Coba lagi nanti.' }
 });
+app.use('/api/auth', authLimiter);
 
-// Serve static files from FrontEnd folder
-const frontEndPath = path.join(__dirname, "FrontEnd");
-app.use("/images", express.static(path.join(__dirname, "images")));
-app.use(express.static(frontEndPath, { index: false, fallthrough: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api', apiRoutes);
 
-const authRoutes = require("./routes/authroutes");
-const healthRoutes = require("./routes/healthroutes");
-const inquiryRoutes = require("./routes/inquiryroutes");
-const kunjunganRoutes = require("./routes/kunjunganroutes");
-const medicinesRoutes = require("./routes/medicinesroutes");
-const adjustRoutes = require("./routes/adjustroutes");
-
-app.use("/auth", authRoutes);
-app.use("/health", healthRoutes);
-app.use("/inquiry", inquiryRoutes);
-app.use("/kunjungan", kunjunganRoutes);
-app.use("/medicines", medicinesRoutes);
-app.use("/adjust", adjustRoutes);
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(frontEndPath, "login.html"));
-});
-
-app.get("/login", (req, res) => {
-  res.sendFile(path.join(frontEndPath, "login.html"));
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
 app.use((req, res) => {
-    res.status(404).json({ message: "Route not found" });
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ message: 'Endpoint API tidak ditemukan.' });
+  }
+  return res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
-});
+app.use(errorHandler);
 
-// Initialize database and start server
-initializeDatabase().then((dbAvailable) => {
-    if (dbAvailable) {
-        console.log('✅ Full database functionality enabled');
-    } else {
-        console.log('⚠️  Running in demo mode (JSON files) - MySQL not available');
-    }
+async function startServer() {
+  try {
+    await ensureDatabase();
+    await sequelize.authenticate();
+    await sequelize.sync({ alter: true });
+    await seedInitialData();
+    initSocket(server);
 
-    app.listen(PORT, () => {
-        console.log(`🚀 Server running at http://localhost:${PORT}`);
-        console.log('📱 Frontend: http://localhost:3000');
-        console.log('🔗 API Base: http://localhost:3000');
+    server.listen(PORT, () => {
+      console.log(`Clinic UAS berjalan di http://localhost:${PORT}`);
+      console.log(`Dashboard multi-user real-time: http://localhost:${PORT}/login.html`);
+      console.log(`Dokumentasi REST API: http://localhost:${PORT}/api-docs`);
     });
-}).catch(error => {
-    console.error('❌ Critical error during startup:', error);
-    console.log('🔄 Starting server in demo mode...');
+  } catch (error) {
+    console.error('Gagal menjalankan server:', error);
+    process.exit(1);
+  }
+}
 
-    app.listen(PORT, () => {
-        console.log(`🚀 Server running at http://localhost:${PORT} (Demo Mode)`);
-        console.log('📱 Frontend: http://localhost:3000');
-        console.log('🔗 API Base: http://localhost:3000');
-        console.log('⚠️  Database features disabled - using JSON files');
-    });
-});
+startServer();

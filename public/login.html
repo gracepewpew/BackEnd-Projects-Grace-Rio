@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - MediCare Clinic UAS</title>
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/main.css" rel="stylesheet">
+  <link href="assets/css/uas-custom.css" rel="stylesheet">
+</head>
+<body class="auth-page">
+  <main class="container py-5">
+    <div class="row justify-content-center align-items-center min-vh-100 g-4">
+      <div class="col-lg-6">
+        <div class="auth-hero">
+          <a href="index.html" class="text-white text-decoration-none fw-bold"><i class="bi bi-arrow-left"></i> Kembali ke Home</a>
+          <h1 class="mt-5 mb-3">MediCare Clinic</h1>
+          <p class="lead">Login untuk mengakses dashboard sesuai role: Admin, Pasien, atau Dokter.</p>
+          <div class="mt-4">
+            <p class="mb-2"><strong>Demo Admin:</strong> admin@clinic.test / admin12345</p>
+            <p class="mb-2"><strong>Demo Pasien:</strong> pasien@clinic.test / pasien12345</p>
+            <p class="mb-0"><strong>Demo Dokter:</strong> sarah@clinic.test / doctor12345</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="auth-card p-4 p-md-5">
+          <h2 class="fw-bold mb-2">Login</h2>
+          <p class="text-muted mb-4">Masuk ke akun klinik Anda.</p>
+          <div id="authMessage" class="message-box mb-3"></div>
+          <form id="loginForm">
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control" placeholder="email@contoh.com" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Password</label>
+              <input type="password" name="password" class="form-control" placeholder="Minimal 8 karakter" required>
+            </div>
+            <button class="btn btn-primary w-100 py-2" type="submit">Login</button>
+          </form>
+          <p class="mt-4 mb-0 text-center">Belum punya akun? <a href="register.html">Register Pasien</a></p>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/app/api.js"></script>
+  <script src="assets/js/app/auth.js"></script>
+</body>
+</html>

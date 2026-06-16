@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - MediCare Clinic UAS</title>
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/main.css" rel="stylesheet">
+  <link href="assets/css/uas-custom.css" rel="stylesheet">
+</head>
+<body class="dashboard-page">
+  <nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html">MediCare</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#dashboardNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="dashboardNavbar">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+          <li class="nav-item"><a class="nav-link" href="#appointmentSection">Appointment</a></li>
+          <li class="nav-item cs-admin-only d-none"><a class="nav-link" href="#csArea">CS Inbox</a></li>
+          <li class="nav-item admin-only d-none"><a class="nav-link" href="#adminArea">Admin Area</a></li>
+          <li class="nav-item"><a class="nav-link" href="api-docs">API Docs</a></li>
+          <li class="nav-item"><span id="roleBadge" class="role-badge">Role</span></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <img id="navAvatar" class="profile-avatar-small" src="assets/img/person/person-m-3.webp" alt="Profile">
+              <span class="d-none d-md-inline">Profile</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#profileArea"><i class="bi bi-person-circle me-2"></i> Edit Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><button id="logoutBtn" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i> Logout</button></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-5">
+    <div class="dashboard-card p-4 p-md-5 mb-4">
+      <div class="row align-items-center g-3">
+        <div class="col-lg-8">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <img id="heroAvatar" class="profile-avatar-large" src="assets/img/person/person-m-3.webp" alt="Profile">
+            <div>
+              <h1 class="fw-bold mb-1">Dashboard Klinik</h1>
+              <p class="text-muted mb-0">Selamat datang, <strong id="userName">User</strong>. Data berubah real-time sesuai role login.</p>
+            </div>
+          </div>
+          <small class="text-muted">Catatan: dashboard memakai sessionStorage, jadi pasien, CS, dokter, dan admin dapat dibuka bersamaan di tab/window berbeda.</small>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <button id="openAppointmentBtn" class="btn btn-primary"><i class="bi bi-calendar-plus"></i> Buat Appointment</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="dashboardMessage" class="message-box mb-4"></div>
+    <div id="statsRow" class="row g-4 mb-4"></div>
+
+    <section id="patientAppointmentArea" class="table-card mb-4 d-none">
+      <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+        <div>
+          <h3 class="admin-section-title mb-1">Request Appointment Pasien</h3>
+          <p class="text-muted mb-0">Pasien hanya mengirim nama, nomor RM/ID, dan keluhan. Customer Service yang menentukan dokter dan jadwal.</p>
+        </div>
+      </div>
+      <form id="patientAppointmentForm" class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Nama Pasien</label>
+          <input class="form-control" id="patientRequestName" name="patientName" readonly>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Nomor ID / No. RM</label>
+          <input class="form-control" id="patientRequestNumber" name="patientNumber" readonly>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Status Awal</label>
+          <input class="form-control" value="Masuk ke inbox Customer Service" readonly>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Keluhan Pasien</label>
+          <textarea class="form-control" name="symptoms" rows="4" placeholder="Contoh: demam sejak 2 hari, pusing, nyeri dada, ingin konsultasi..." required></textarea>
+        </div>
+        <div class="col-12">
+          <button class="btn btn-primary" type="submit"><i class="bi bi-send"></i> Kirim ke Customer Service</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="appointmentSection" class="table-card mb-4">
+      <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+        <div>
+          <h3 class="admin-section-title mb-1">Appointment / Jadwal Konsultasi</h3>
+          <p class="text-muted mb-0">Pasien melihat request sendiri, CS memilih poli dan dokter, lalu dokter menentukan jadwal final.</p>
+        </div>
+        <button class="btn btn-outline-primary btn-sm" onclick="Dashboard.loadAppointments()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Pasien</th>
+              <th>No. RM</th>
+              <th>Keluhan</th>
+              <th>Poli</th>
+              <th>Dokter</th>
+              <th>Jadwal</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="appointmentsTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="csArea" class="d-none mb-4">
+      <div class="row g-4">
+        <div class="col-12">
+          <div class="table-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h3 class="admin-section-title mb-1">Inbox Customer Service</h3>
+                <p class="text-muted mb-0">Atur poli dan dokter sesuai spesialisasi. Jadwal tanggal dan jam ditentukan oleh dokter setelah request dikirim.</p>
+              </div>
+              <button class="btn btn-outline-primary btn-sm" onclick="Dashboard.loadAppointments()">Refresh</button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead><tr><th>Pasien</th><th>Keluhan</th><th>Poli</th><th>Dokter</th><th>Status</th><th>Live Chat</th><th>Kirim Request</th></tr></thead>
+                <tbody id="csInboxTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="table-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h3 class="admin-section-title mb-0">Live Chat Masuk</h3>
+              <button class="btn btn-outline-primary btn-sm" onclick="Dashboard.loadConversations()">Refresh</button>
+            </div>
+            <div id="csConversationList" class="conversation-list"></div>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="table-card h-100 chat-panel-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h3 id="csChatTitle" class="admin-section-title mb-0">Pilih percakapan pasien</h3>
+                <small id="csChatMeta" class="text-muted">Chat real-time seperti WhatsApp sederhana.</small>
+              </div>
+              <button id="closeChatBtn" class="btn btn-outline-danger btn-sm d-none" type="button"><i class="bi bi-x-circle"></i> Akhiri Obrolan</button>
+            </div>
+            <div id="csChatMessages" class="chat-messages-box"></div>
+            <form id="csChatForm" class="chat-input-row mt-3 d-none">
+              <input class="form-control" name="message" placeholder="Balas pasien..." autocomplete="off" required>
+              <button class="btn btn-primary" type="submit"><i class="bi bi-send"></i></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="profileArea" class="table-card mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h3 class="admin-section-title mb-1">Profile User</h3>
+          <p class="text-muted mb-0">Klik icon profile di kanan atas untuk kembali ke bagian ini. Nama, email, nomor telepon, alamat, dan foto dapat diganti.</p>
+        </div>
+      </div>
+      <form id="profileForm" class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Nama</label>
+          <input class="form-control" name="name" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          <input class="form-control" name="email" type="email" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Nomor Telepon</label>
+          <input class="form-control" name="phone" placeholder="08123456789">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Foto Profile</label>
+          <div class="profile-upload-row">
+            <img id="profilePreview" class="profile-avatar-small" src="assets/img/person/person-m-3.webp" alt="Preview">
+            <div class="flex-grow-1">
+              <input type="hidden" name="profilePhoto" id="profilePhotoHidden">
+              <input class="form-control" id="profilePhotoFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+              <small class="text-muted">Klik tombol upload untuk mengganti foto profile. Maksimal 2 MB.</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 patient-profile-only d-none">
+          <label class="form-label">Tanggal Lahir</label>
+          <input class="form-control" name="birthDate" type="date">
+        </div>
+        <div class="col-md-3 patient-profile-only d-none">
+          <label class="form-label">Gender</label>
+          <select class="form-select" name="gender">
+            <option value="">Pilih</option>
+            <option value="Laki-laki">Laki-laki</option>
+            <option value="Perempuan">Perempuan</option>
+          </select>
+        </div>
+        <div class="col-md-3 patient-profile-only d-none">
+          <label class="form-label">Golongan Darah</label>
+          <select class="form-select" name="bloodType">
+            <option value="">Pilih</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="AB">AB</option>
+            <option value="O">O</option>
+          </select>
+        </div>
+        <div class="col-12 patient-profile-only d-none">
+          <label class="form-label">Alamat Rumah</label>
+          <textarea class="form-control" name="address" rows="3"></textarea>
+        </div>
+        <div class="col-12">
+          <button class="btn btn-primary" type="submit"><i class="bi bi-save"></i> Simpan Profile</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="adminArea" class="d-none mb-4">
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="table-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h3 class="admin-section-title mb-0">Data Poli / Layanan</h3>
+              <button class="btn btn-outline-primary btn-sm" onclick="Dashboard.loadDepartments()">Refresh</button>
+            </div>
+            <form id="departmentForm" class="row g-2 mb-3">
+              <div class="col-md-6"><input class="form-control" name="name" placeholder="Nama Poli" required></div>
+              <div class="col-md-6"><input class="form-control" name="location" placeholder="Lokasi" required></div>
+              <div class="col-12"><input class="form-control" name="description" placeholder="Deskripsi" required></div>
+              <div class="col-12"><button class="btn btn-primary btn-sm">Tambah Poli</button></div>
+            </form>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead><tr><th>Poli</th><th>Lokasi</th><th>Status</th></tr></thead>
+                <tbody id="departmentsTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="table-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h3 class="admin-section-title mb-0">Data Dokter</h3>
+              <button class="btn btn-outline-primary btn-sm" onclick="Dashboard.loadDoctors()">Refresh</button>
+            </div>
+            <form id="doctorForm" class="row g-2 mb-3">
+              <div class="col-md-6"><input class="form-control" name="name" placeholder="Nama Dokter" required></div>
+              <div class="col-md-6"><input class="form-control" name="email" placeholder="Email" required></div>
+              <div class="col-md-6"><input class="form-control" name="phone" placeholder="Telepon" required></div>
+              <div class="col-md-6"><select class="form-select" name="departmentId" id="doctorDepartmentSelect" required><option value="">Pilih Poli</option></select></div>
+              <div class="col-md-6"><input class="form-control" name="specialization" placeholder="Spesialisasi" required></div>
+              <div class="col-md-6"><input class="form-control" name="schedule" placeholder="Jadwal" required></div>
+              <div class="col-12 form-check ms-2"><input class="form-check-input" type="checkbox" name="createLogin" id="createLogin"><label class="form-check-label" for="createLogin">Buat akun login dokter</label></div>
+              <div class="col-12"><button class="btn btn-primary btn-sm">Tambah Dokter</button></div>
+            </form>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead><tr><th>Dokter</th><th>Poli</th><th>Jadwal</th></tr></thead>
+                <tbody id="doctorsTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="table-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h3 class="admin-section-title mb-0">Data Pasien</h3>
+              <button class="btn btn-outline-primary btn-sm" onclick="Dashboard.loadPatients()">Refresh</button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead><tr><th>No RM</th><th>Nama</th><th>Email</th><th>Telepon</th></tr></thead>
+                <tbody id="patientsTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="table-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h3 class="admin-section-title mb-0">Contact / Feedback</h3>
+              <button class="btn btn-outline-primary btn-sm" onclick="Dashboard.loadFeedbacks()">Refresh</button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead><tr><th>Nama</th><th>Subject</th><th>Status</th><th>Aksi</th></tr></thead>
+                <tbody id="feedbacksTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="col-12">
+          <div class="table-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h3 class="admin-section-title mb-1">Alasan Cancel Dokter</h3>
+                <p class="text-muted mb-0">Table ini berisi alasan pembatalan appointment dari dokter untuk dicek admin.</p>
+              </div>
+              <button class="btn btn-outline-primary btn-sm" onclick="Dashboard.loadCancellations()">Refresh</button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead><tr><th>Appointment</th><th>Pasien</th><th>Dokter</th><th>Alasan Cancel</th><th>Waktu</th></tr></thead>
+                <tbody id="cancellationsTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="table-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h3 class="admin-section-title mb-1">History Live Chat</h3>
+                <p class="text-muted mb-0">Admin dapat membuka riwayat chat pasien, termasuk chat yang sudah diakhiri CS.</p>
+              </div>
+              <button class="btn btn-outline-primary btn-sm" onclick="Dashboard.loadConversations()">Refresh</button>
+            </div>
+            <div class="row g-3">
+              <div class="col-lg-4"><div id="adminConversationList" class="conversation-list"></div></div>
+              <div class="col-lg-8"><div id="adminChatMessages" class="chat-messages-box"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <button id="patientChatButton" class="patient-chat-button d-none" type="button"><i class="bi bi-chat-dots"></i></button>
+  <div id="patientChatWidget" class="patient-chat-widget d-none">
+    <div class="chat-widget-header">
+      <div>
+        <strong>Live Chat CS</strong><br>
+        <small>Real-time dengan Customer Service</small>
+      </div>
+      <button id="patientChatClose" class="btn btn-sm btn-light" type="button"><i class="bi bi-x"></i></button>
+    </div>
+    <div id="patientChatMessages" class="chat-messages-box"></div>
+    <form id="patientChatForm" class="chat-input-row p-2">
+      <input class="form-control" name="message" placeholder="Tulis pesan..." autocomplete="off" required>
+      <button class="btn btn-primary" type="submit"><i class="bi bi-send"></i></button>
+    </form>
+  </div>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="assets/js/app/api.js"></script>
+  <script src="assets/js/app/dashboard.js"></script>
+</body>
+</html>
