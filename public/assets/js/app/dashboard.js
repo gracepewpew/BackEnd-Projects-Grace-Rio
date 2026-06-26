@@ -191,12 +191,15 @@ const Dashboard = (() => {
       document.getElementById('adminArea').classList.remove('d-none');
       document.querySelectorAll('.admin-only').forEach((item) => item.classList.remove('d-none'));
       document.querySelectorAll('.cs-admin-only').forEach((item) => item.classList.remove('d-none'));
+      const apiDocsLink = document.querySelector('#apiDocsNav a');
+      if (apiDocsLink) apiDocsLink.href = `/api-docs?token=${Api.getToken()}`;
+    } else {
+      document.getElementById('apiDocsNav').classList.add('d-none');
     }
     if (currentUser.role === 'customer_service') {
       document.getElementById('csArea').classList.remove('d-none');
       document.querySelectorAll('.cs-admin-only').forEach((item) => item.classList.remove('d-none'));
       document.getElementById('openAppointmentBtn').innerHTML = '<i class="bi bi-inbox"></i> Buka Inbox CS';
-      document.getElementById('apiDocsNav').classList.add('d-none');
     }
     if (currentUser.role === 'pasien') {
       document.getElementById('patientAppointmentArea').classList.remove('d-none');

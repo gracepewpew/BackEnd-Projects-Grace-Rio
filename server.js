@@ -6,6 +6,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const jwt = require('jsonwebtoken');
 const swaggerUi = require('swagger-ui-express');
 
 const ensureDatabase = require('./src/config/ensureDatabase');
@@ -34,7 +35,21 @@ const authLimiter = rateLimit({
 app.use('/api/auth', authLimiter);
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+function adminOnlyApiDocs(req, res, next) {
+  if (req.path !== '/' && req.path !== '') return next();
+  try {
+    const token = (req.headers.authorization || '').replace('Bearer ', '') || req.query.token;
+    if (!token) throw new Error('no token');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'clinic-secret');
+    if (decoded.role !== 'admin') throw new Error('not admin');
+    next();
+  } catch {
+    return res.status(403).send(`<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><title>Akses Ditolak</title><link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"></head><body class="d-flex align-items-center justify-content-center vh-100 bg-light"><div class="text-center p-5"><h2 class="fw-bold text-danger mb-3">Akses Ditolak</h2><p class="text-muted mb-4">Dokumentasi API hanya dapat diakses oleh <strong>Admin</strong>.</p><a href="/login.html" class="btn btn-primary">← Kembali ke Login</a></div></body></html>`);
+  }
+}
+
+app.use('/api-docs', adminOnlyApiDocs, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api', apiRoutes);
 
 app.get('/dashboard', (req, res) => {
