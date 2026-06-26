@@ -1,162 +1,134 @@
-# MediCare Clinic UAS - Real-Time Version
+# MediCare Clinic UAS — Real-Time Multi-Role
 
-Project ini dibuat dari template **Clinic-1.0.0** yang sudah diberikan, lalu dimaksimalkan menjadi aplikasi web klinik dengan backend Express.js, REST API, MySQL database, authentication, authorization, middleware, dashboard role-based, Customer Service workflow, appointment inbox, live chat real-time, data pasien, data dokter, data poli, dan contact/feedback.
+Project UAS berbasis template **Clinic-1.0.0** yang dikembangkan menjadi aplikasi web klinik lengkap dengan backend Express.js, REST API, MySQL, authentication, authorization, dashboard role-based, live chat real-time, appointment workflow multi-peran, contact/feedback berkategori, dan adjustable list view pada semua tabel.
 
 ## Fitur Utama
 
 1. **Login & Register Pasien**
-   - Register pasien baru.
-   - Password memakai show/hide icon mata.
-   - Ada kolom **Re-enter Password**.
-   - Validasi password harus sama di frontend dan backend.
-   - Password di-hash menggunakan bcrypt.
-   - Token menggunakan JWT.
+   - Register pasien baru dengan validasi email, telepon, dan password.
+   - Password memakai show/hide icon mata dan kolom Re-enter Password.
+   - Password di-hash menggunakan bcrypt, token menggunakan JWT.
 
-2. **Multi-Role**
-   - Admin.
-   - Pasien.
-   - Dokter.
-   - Customer Service.
+2. **Multi-Role (4 Role)**
+   - Admin, Pasien, Dokter, Customer Service.
+   - Setiap role melihat tampilan dan data yang berbeda.
 
 3. **Buka Banyak User Bersamaan**
    - Token disimpan di `sessionStorage`, bukan `localStorage`.
-   - Artinya 1 browser bisa membuka beberapa tab/window dengan login berbeda: Pasien, CS, Dokter, dan Admin.
-   - Cocok untuk demo real-time UAS.
+   - 1 browser bisa membuka banyak tab/window dengan login berbeda sekaligus.
+   - Cocok untuk demo real-time (Pasien, CS, Dokter, Admin di tab berbeda).
 
 4. **Profile User**
-   - Icon profile tersedia di dashboard.
-   - User bisa mengubah nama, email, nomor telepon, dan foto profile melalui tombol upload file.
-   - Pasien bisa mengubah data tambahan: tanggal lahir, gender, golongan darah, alamat rumah.
+   - Ubah nama, email, nomor telepon, dan foto profile melalui upload file.
+   - Pasien bisa mengubah data tambahan: tanggal lahir, gender, golongan darah, alamat.
 
-5. **Appointment Workflow Baru**
-   - Pasien tidak memilih dokter/tanggal langsung.
-   - Pasien hanya mengirim:
-     - Nama pasien otomatis.
-     - Nomor ID / No. RM otomatis.
-     - Keluhan pasien.
-   - Request masuk ke **Inbox Customer Service**.
-   - Status awal appointment adalah **PENDING**.
-   - Customer Service memilih **poli terlebih dahulu**, lalu dokter yang muncul otomatis hanya dokter pada poli tersebut.
-   - Setelah CS mengirim ke dokter, status berubah menjadi **REQUESTED**.
-   - Dokter menentukan tanggal dan jam, lalu status berubah menjadi **SCHEDULED**.
-   - Dokter bisa menandai **COMPLETE** atau **CANCEL**. Jika cancel, dokter wajib mengisi alasan dan alasan masuk ke table admin.
+5. **Appointment Workflow Multi-Peran (5 Status)**
+   - Pasien mengirim nama, No. RM, dan keluhan → status **PENDING**.
+   - Customer Service memilih poli lalu dokter sesuai poli → status **REQUESTED**.
+   - Dokter menentukan tanggal dan jam → status **SCHEDULED**.
+   - Dokter menandai selesai → **COMPLETED** / **CANCELLED**.
+   - Jika cancel, dokter wajib isi alasan dan tercatat di riwayat admin.
 
 6. **Customer Service Dashboard**
-   - Melihat request appointment pasien.
-   - Memilih poli dan dokter yang sesuai. Tanggal dan jam ditentukan oleh dokter.
-   - Membalas Live Chat dari pasien secara real-time.
-   - Mengakhiri obrolan pasien.
-   - Chat yang sudah selesai tetap tersimpan sebagai history.
+   - Inbox appointment pasien dengan filter dan pencarian.
+   - Pilih poli terlebih dahulu, dokter muncul otomatis sesuai poli.
+   - Membalas live chat pasien secara real-time.
+   - Panel chat selalu terlihat (sticky) tanpa perlu scroll ke bawah.
+   - Notifikasi toast muncul otomatis jika ada pesan dari percakapan lain.
+   - Mengakhiri obrolan; history tersimpan dan bisa dilihat admin.
 
-7. **Live Chat Real-Time**
-   - Pasien punya bubble chat khusus di kanan bawah dashboard.
-   - Pasien dan CS bisa chat seperti WhatsApp sederhana.
-   - CS bisa mengakhiri obrolan.
-   - Admin bisa membuka history chat.
+7. **Live Chat Real-Time (Socket.IO)**
+   - Pasien punya bubble chat di kanan bawah dashboard seperti WhatsApp.
+   - CS membalas pesan secara real-time.
+   - Admin bisa membuka history seluruh percakapan.
+   - Notifikasi real-time untuk appointment dan chat ke semua role.
 
-8. **Dummy Data**
-   - Dokter mengikuti data yang ada di template `doctors.html`:
-     - Dr. Marcus Johnson
-     - Dr. Sarah Williams
-     - Dr. Michael Chen
-     - Dr. Emily Rodriguez
-     - Dr. David Thompson
-     - Dr. Lisa Anderson
-     - Dr. Robert Martinez
-     - Dr. Jennifer Lee
-   - Setiap dokter memiliki 5 dummy pasien/appointment.
-   - Total dummy pasien untuk simulasi dokter: 40 pasien.
+8. **Contact & Feedback Berkategori**
+   - Halaman kontak dengan 4 kategori: Pertanyaan, Keluhan, Saran, Lainnya.
+   - Kategori dipilih via tombol pill dan disimpan di database.
+   - Tabel admin menampilkan badge warna per kategori.
+   - Admin dapat filter per kategori dan status (Baru/Dibaca/Dibalas).
+   - Tombol aksi: Tandai Dibaca, Sudah Dibalas, Hapus.
 
-9. **REST API Documentation**
-   - Swagger tersedia di `/api-docs`.
+9. **Adjustable List View pada Semua Tabel**
+   - Setiap tabel punya kolom pencarian, filter status/kategori, dan pilihan jumlah baris (10/25/Semua).
+   - Area scroll terbatas dengan header kolom yang selalu terlihat (sticky).
+   - Pagination Prev/Next otomatis muncul jika data melebihi batas per halaman.
+   - Filter bekerja langsung di sisi klien tanpa reload halaman.
+
+10. **Upload Foto Profile**
+    - Upload langsung dari dashboard dengan validasi tipe file (JPG/PNG/WEBP/GIF) dan ukuran maksimal 2 MB.
+
+11. **Swagger UI Dokumentasi API**
+    - Dokumentasi REST API interaktif tersedia di `/api-docs`.
+
+12. **Keamanan Berlapis**
+    - Rate limiting 150 request/15 menit pada endpoint auth.
+    - Helmet untuk security headers.
+    - Validasi input di backend untuk semua field penting.
 
 ## Teknologi
 
-- HTML, CSS, JavaScript
-- Bootstrap template Clinic
-- Node.js
-- Express.js
-- MySQL / MariaDB
-- Sequelize ORM
-- JWT Authentication
-- Socket.IO untuk real-time appointment dan live chat
-- Middleware: auth, role authorization, validation, error handler, rate limiter, Helmet, CORS, Morgan
+**Back-End:**
+- Node.js + Express.js, MySQL, Sequelize ORM
+- JWT Authentication, bcryptjs
+- Socket.IO (real-time appointment & live chat)
+- Multer (upload foto profile)
+- Helmet, CORS, Morgan, express-rate-limit, dotenv
 - Swagger UI Express
+
+**Front-End:**
+- HTML, CSS, JavaScript (Vanilla), Bootstrap 5, Socket.IO Client
+- Template: Clinic Bootstrap Template (Clinic-1.0.0)
 
 ## Cara Menjalankan
 
-### 1. Extract project
-
-Buka folder project di VS Code.
-
-### 2. Install dependency
+### 1. Install dependency
 
 ```bash
 npm install
 ```
 
-### 3. Buat file `.env`
+### 2. Buat file `.env`
 
-Copy dari `.env.example` menjadi `.env`.
-
-```bash
-copy .env.example .env
-```
-
-Untuk Windows PowerShell:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Contoh isi `.env`:
+Buat file baru bernama `.env` di root project, isi dengan:
 
 ```env
 PORT=8888
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=clinic_uas_v3
+DB_NAME=clinic_uas
 DB_USER=root
 DB_PASS=
-JWT_SECRET=ganti_dengan_secret_yang_lebih_panjang
+JWT_SECRET=ganti_dengan_secret_panjang_acak
 JWT_EXPIRES_IN=1d
-APP_URL=http://localhost:8888
 ```
 
-### 4. Pastikan MySQL/MariaDB hidup
+> Sesuaikan `DB_PASS` dengan password MySQL lokal. Jika tidak ada password, kosongkan saja.
 
-Gunakan XAMPP/Laragon/MySQL lokal. Port default: `3306`.
-
-Database akan dibuat otomatis saat `npm start` karena project menggunakan Sequelize.
-
-Kalau sebelumnya kamu sudah menjalankan versi lama, paling bersih gunakan salah satu cara ini:
-
-1. Buat database baru dengan nama berbeda di `.env`, misalnya `clinic_uas_v4`, atau
-2. Drop database lama `clinic_uas_v3`, lalu jalankan ulang `npm start`.
-
-### 5. Jalankan server
+### 3. Import database
 
 ```bash
-npm start
+mysql -u root < database/database.sql
 ```
 
-Buka:
+> File SQL sudah berisi perintah `CREATE DATABASE` dan `USE clinic_uas` secara otomatis.
 
-```txt
-http://localhost:8888
+### 4. Jalankan server
+
+```bash
+npm run dev
 ```
 
-Dashboard:
+Buka browser:
 
-```txt
-http://localhost:8888/dashboard.html
+```
+http://localhost:8888          ← halaman utama
+http://localhost:8888/login.html
+http://localhost:8888/api-docs ← Swagger
 ```
 
-Swagger API Docs:
-
-```txt
-http://localhost:8888/api-docs
-```
+> Database akan di-sync otomatis via Sequelize saat server start. Seed data (akun demo, dokter, poli, pasien) dibuat otomatis jika belum ada.
 
 ## Akun Demo
 
@@ -176,16 +148,15 @@ http://localhost:8888/api-docs
 
 ## Cara Demo Real-Time
 
-1. Buka tab 1: `http://localhost:8888/login.html`, login sebagai pasien.
-2. Buka tab 2: `http://localhost:8888/login.html`, login sebagai Customer Service.
-3. Buka tab 3: `http://localhost:8888/login.html`, login sebagai dokter, misalnya `marcus@clinic.test`.
+1. Buka **Tab 1** → login sebagai `pasien@clinic.test`
+2. Buka **Tab 2** → login sebagai `cs@clinic.test`
+3. Buka **Tab 3** → login sebagai `marcus@clinic.test`
 4. Di tab pasien, buat appointment dari dashboard.
-5. Di tab CS, request muncul di inbox.
-6. CS pilih poli terlebih dahulu, lalu pilih dokter yang muncul sesuai poli, kemudian klik **Kirim ke Dokter**. Status menjadi REQUESTED.
-7. Di tab dokter, appointment muncul otomatis. Dokter pilih tanggal dan jam, lalu klik **Jadwalkan**. Status menjadi SCHEDULED.
-8. Dokter dapat klik COMPLETE atau CANCEL. Jika CANCEL, alasan wajib diisi dan masuk ke table admin.
-9. Di tab pasien, klik bubble live chat kanan bawah dan chat dengan CS.
-10. CS dapat mengakhiri chat, lalu Admin bisa melihat history.
+5. Di tab CS, request muncul langsung di inbox → pilih poli → pilih dokter → klik **Kirim ke Dokter**. Status: REQUESTED.
+6. Di tab dokter, appointment muncul otomatis → pilih tanggal & jam → klik **Jadwalkan**. Status: SCHEDULED.
+7. Dokter klik **Complete** atau **Cancel** (jika cancel, wajib isi alasan).
+8. Di tab pasien, klik bubble chat kanan bawah → chat dengan CS.
+9. CS mengakhiri chat → Admin bisa lihat history.
 
 ## Endpoint REST API Utama
 
@@ -193,49 +164,52 @@ http://localhost:8888/api-docs
 |---|---|---|
 | POST | `/api/auth/register` | Register pasien |
 | POST | `/api/auth/login` | Login user |
-| GET | `/api/auth/me` | User login |
+| GET | `/api/auth/me` | Data user login |
 | GET | `/api/auth/profile` | Detail profile user |
 | PUT | `/api/auth/profile` | Update profile user |
-| POST | `/api/auth/profile-photo` | Upload foto profile user |
+| POST | `/api/auth/profile-photo` | Upload foto profile |
 | GET | `/api/departments` | List poli |
-| POST | `/api/departments` | Tambah poli, admin only |
+| POST | `/api/departments` | Tambah poli (admin) |
 | GET | `/api/doctors` | List dokter |
-| POST | `/api/doctors` | Tambah dokter, admin only |
-| GET | `/api/patients` | List pasien, admin/CS |
-| POST | `/api/appointments` | Pasien membuat request appointment |
+| POST | `/api/doctors` | Tambah dokter (admin) |
+| GET | `/api/patients` | List pasien (admin/CS) |
+| POST | `/api/appointments` | Pasien buat request appointment |
 | GET | `/api/appointments` | List appointment sesuai role |
-| PATCH | `/api/appointments/:id/assign` | CS/Admin memilih poli dan dokter, status menjadi requested |
-| PATCH | `/api/appointments/:id/schedule` | Dokter menentukan tanggal dan jam, status menjadi scheduled |
+| PATCH | `/api/appointments/:id/assign` | CS pilih poli & dokter → REQUESTED |
+| PATCH | `/api/appointments/:id/schedule` | Dokter tentukan tanggal & jam → SCHEDULED |
 | PATCH | `/api/appointments/:id/status` | Dokter complete/cancel appointment |
-| GET | `/api/appointments/cancellations` | Admin melihat alasan cancel dokter |
-| POST | `/api/chat/conversations` | Pasien membuat/membuka live chat |
-| POST | `/api/chat/conversations/from-patient` | CS membuka bubble chat per pasien dari appointment |
-| GET | `/api/chat/conversations` | CS/Admin melihat daftar chat |
-| GET | `/api/chat/conversations/:id/messages` | Lihat isi chat |
-| POST | `/api/chat/conversations/:id/messages` | Kirim pesan chat |
-| PATCH | `/api/chat/conversations/:id/close` | CS/Admin mengakhiri chat |
-| POST | `/api/feedbacks` | Kirim feedback |
-| GET | `/api/feedbacks` | List feedback, admin only |
+| GET | `/api/appointments/cancellations` | Admin lihat riwayat cancel (admin) |
+| DELETE | `/api/appointments/:id` | Hapus appointment (admin) |
+| POST | `/api/feedbacks` | Kirim pesan/feedback |
+| GET | `/api/feedbacks` | List feedback (admin) |
+| PATCH | `/api/feedbacks/:id/status` | Update status feedback (admin) |
+| DELETE | `/api/feedbacks/:id` | Hapus feedback (admin) |
 | GET | `/api/dashboard/stats` | Statistik dashboard sesuai role |
+| POST | `/api/chat/conversations` | Pasien buat/buka live chat |
+| POST | `/api/chat/conversations/from-patient` | CS buka chat dari appointment |
+| GET | `/api/chat/conversations` | CS/Admin lihat daftar chat |
+| GET | `/api/chat/conversations/:id/messages` | Isi pesan chat |
+| POST | `/api/chat/conversations/:id/messages` | Kirim pesan chat |
+| PATCH | `/api/chat/conversations/:id/close` | CS/Admin akhiri chat |
 
-## Pembagian Fitur untuk 2 Anggota
+## Pembagian Fitur
 
-### Anggota 1
+### Anggota 1 — Rio Frederich (211112075)
+- Authentication & authorization (JWT, bcrypt).
+- Register/login & profile user.
+- Data pasien & nomor rekam medis.
+- Middleware: auth, role, validation, error handler.
+- Upload foto profile.
 
-- Authentication & authorization.
-- Register/Login.
-- Profile user.
-- Data pasien.
-- Middleware auth, role, validation.
-
-### Anggota 2
-
-- Appointment workflow.
-- Customer Service dashboard.
-- Live chat real-time.
+### Anggota 2 — Grace Putri Wijaya (211110121)
+- Appointment workflow multi-peran (5 status).
+- Customer Service dashboard & inbox.
+- Live chat real-time (Socket.IO).
 - Data dokter dan poli.
-- Dashboard admin dan hosting.
+- Contact/feedback berkategori.
+- Adjustable list view & dashboard admin.
+- Hosting di Railway.
 
-## Catatan Penting
+## Catatan
 
-Folder `forms/` dan file PHP bawaan template tidak digunakan. Form appointment dan contact sekarang memakai JavaScript `fetch()` ke REST API Node.js. Real-time memakai Socket.IO.
+Folder `forms/` dan file PHP bawaan template tidak digunakan. Semua form memakai JavaScript `fetch()` ke REST API Node.js. Real-time menggunakan Socket.IO.

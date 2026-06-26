@@ -1,6 +1,6 @@
-================================================================
+~~~~
 TUGAS KELOMPOK UAS - PENGEMBANGAN WEB BACK-END
-================================================================
+~~~~
 
 NAMA TIM
 --------
@@ -11,9 +11,9 @@ ANGGOTA TIM
 1. 211112075 - Rio Frederich
 2. 211110121 - Grace Putri Wijaya
 
-================================================================
+~~~~
 TEKNOLOGI YANG DIGUNAKAN
-================================================================
+~~~~
 
 Back-End:
 - Node.js + Express.js        (web server & REST API)
@@ -39,9 +39,9 @@ Template yang Digunakan:
 - Clinic Bootstrap Template (Clinic-1.0.0)
 - Link: https://bootstrapmade.com/demo/Clinic/
 
-================================================================
+~~~~
 INOVASI DAN KREATIVITAS
-================================================================
+~~~~
 
 1. Appointment Workflow Multi-Peran (5 status):
    - Pasien mengirim keluhan -> PENDING
@@ -75,11 +75,24 @@ INOVASI DAN KREATIVITAS
    - Helmet untuk security headers.
    - Validasi input di backend untuk semua field penting.
 
-================================================================
-LINK HOSTINGAN
-================================================================
+7. Contact & Feedback Berkategori:
+   - Halaman kontak dengan 4 kategori pesan: Pertanyaan, Keluhan, Saran, Lainnya.
+   - Kategori disimpan di database dan tampil sebagai badge berwarna di tabel admin.
+   - Admin dapat memfilter pesan berdasarkan kategori dan status (Baru/Dibaca/Dibalas).
+   - Tombol aksi: Tandai Dibaca, Sudah Dibalas, dan Hapus.
 
-URL Aplikasi : https://backend-projects-grace-rio-production.up.railway.app
+8. Adjustable List View pada Semua Tabel:
+   - Setiap tabel dilengkapi kolom pencarian, filter status/kategori, dan pilihan jumlah baris (10/25/Semua).
+   - Tabel memiliki area scroll terbatas dengan header yang tetap terlihat (sticky).
+   - Pagination Prev/Next otomatis muncul jika data melebihi batas per halaman.
+   - Filter bekerja secara langsung di sisi klien tanpa reload halaman.
+
+~~~~
+LINK HOSTINGAN
+~~~~
+
+URL Aplikasi Grace : https://backend-projects-grace-rio-production.up.railway.app
+URL Aplikasi Rio: https://backend-projects-grace-rio-production-43f9.up.railway.app/
 
 Login Admin  :
   Email      : admin@clinic.test
@@ -92,4 +105,4 @@ Login Demo Lainnya:
 
 Dokumentasi API: https://backend-projects-grace-rio-production.up.railway.app/api-docs
 
-================================================================
+~~~~

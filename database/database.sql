@@ -1,9 +1,9 @@
 -- Database schema untuk project UAS MediCare Clinic Real-Time
 -- Cara cepat: import file ini di phpMyAdmin/MySQL, lalu jalankan npm install dan npm start.
--- Jika sebelumnya sudah pernah menjalankan versi lama, paling aman drop database clinic_uas_v3 lalu import ulang file ini agar dummy data baru bersih.
+-- Jika sebelumnya sudah pernah menjalankan versi lama, paling aman drop database clinic_uas lalu import ulang file ini agar dummy data baru bersih.
 
-CREATE DATABASE IF NOT EXISTS clinic_uas_v3 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE clinic_uas_v3;
+CREATE DATABASE IF NOT EXISTS clinic_uas CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE clinic_uas;
 
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -98,6 +98,7 @@ CREATE TABLE IF NOT EXISTS feedbacks (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
   email VARCHAR(120) NOT NULL,
+  category ENUM('pertanyaan', 'keluhan', 'saran', 'lainnya') NOT NULL DEFAULT 'pertanyaan',
   subject VARCHAR(150) NOT NULL,
   message TEXT NOT NULL,
   status ENUM('new', 'read', 'replied') DEFAULT 'new',
