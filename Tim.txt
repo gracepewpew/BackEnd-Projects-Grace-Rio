@@ -1,0 +1,95 @@
+================================================================
+TUGAS KELOMPOK UAS - PENGEMBANGAN WEB BACK-END
+================================================================
+
+NAMA TIM
+--------
+Amoxicillin
+
+ANGGOTA TIM
+-----------
+1. 211112075 - Rio Frederich
+2. 211110121 - Grace Putri Wijaya
+
+================================================================
+TEKNOLOGI YANG DIGUNAKAN
+================================================================
+
+Back-End:
+- Node.js + Express.js        (web server & REST API)
+- Sequelize ORM               (object-relational mapper untuk MySQL)
+- MySQL                       (database)
+- JSON Web Token / JWT        (autentikasi)
+- bcryptjs                    (enkripsi password)
+- Socket.IO                   (real-time notification & live chat)
+- Multer                      (upload foto profile)
+- Helmet                      (security headers)
+- express-rate-limit          (rate limiter endpoint auth)
+- Morgan                      (HTTP request logger)
+- CORS                        (cross-origin resource sharing)
+- Swagger UI Express          (dokumentasi REST API interaktif)
+- dotenv                      (manajemen environment variables)
+
+Front-End:
+- HTML, CSS, JavaScript (Vanilla)
+- Bootstrap 5
+- Socket.IO Client
+
+Template yang Digunakan:
+- Clinic Bootstrap Template (Clinic-1.0.0)
+- Link: https://bootstrapmade.com/demo/Clinic/
+
+================================================================
+INOVASI DAN KREATIVITAS
+================================================================
+
+1. Appointment Workflow Multi-Peran (5 status):
+   - Pasien mengirim keluhan -> PENDING
+   - Customer Service memilih poli & dokter -> REQUESTED
+   - Dokter menentukan tanggal & jam -> SCHEDULED
+   - Dokter menandai selesai -> COMPLETED / CANCELLED
+   - Jika cancel, dokter wajib isi alasan dan tercatat di riwayat admin.
+
+2. Live Chat Real-Time (Socket.IO):
+   - Pasien punya bubble chat di dashboard seperti WhatsApp.
+   - Customer Service membalas pesan secara real-time.
+   - Admin dapat melihat history seluruh percakapan.
+   - Notifikasi real-time untuk appointment dan chat ke semua role.
+
+3. Multi-Role Dashboard:
+   - 4 role: Admin, Pasien, Dokter, Customer Service.
+   - Token disimpan di sessionStorage sehingga bisa buka banyak tab
+     dengan login berbeda bersamaan (demo multi-user).
+   - Statistik card berbeda tiap role.
+
+4. Upload Foto Profile:
+   - User bisa upload foto profile langsung dari dashboard.
+   - File disimpan di server dengan validasi tipe file dan ukuran.
+
+5. Swagger UI Dokumentasi API:
+   - Dokumentasi REST API interaktif tersedia di /api-docs.
+   - Setiap endpoint terdokumentasi dengan method, parameter, dan response.
+
+6. Keamanan Berlapis:
+   - Rate limiting 150 request/15 menit pada endpoint auth.
+   - Helmet untuk security headers.
+   - Validasi input di backend untuk semua field penting.
+
+================================================================
+LINK HOSTINGAN
+================================================================
+
+URL Aplikasi : https://backend-projects-grace-rio-production.up.railway.app
+
+Login Admin  :
+  Email      : admin@clinic.test
+  Password   : admin12345
+
+Login Demo Lainnya:
+  Customer Service -> cs@clinic.test         / cs12345
+  Pasien Demo      -> pasien@clinic.test     / pasien12345
+  Dokter           -> marcus@clinic.test     / doctor12345
+
+Dokumentasi API: https://backend-projects-grace-rio-production.up.railway.app/api-docs
+
+================================================================
