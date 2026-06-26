@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
   <meta charset="utf-8">
@@ -98,12 +98,10 @@
         <div class="container">
           <div class="row d-flex justify-content-center text-center">
             <div class="col-lg-8">
-              <h1 class="heading-title">Contact</h1>
+              <h1 class="heading-title">Hubungi Kami</h1>
               <p class="mb-0">
-                Odio et unde deleniti. Deserunt numquam exercitationem. Officiis quo
-                odio sint voluptas consequatur ut a odio voluptatem. Sit dolorum
-                debitis veritatis natus dolores. Quasi ratione sint. Sit quaerat
-                ipsum dolorem.
+                Ada pertanyaan seputar layanan, keluhan yang ingin disampaikan, atau saran untuk kami?
+                Isi formulir di bawah dan tim admin akan merespons pesan Anda.
               </p>
             </div>
           </div>
@@ -128,33 +126,42 @@
             <div class="contact-info-wrapper">
               <div class="contact-info-item" data-aos="fade-up" data-aos-delay="100">
                 <div class="info-icon">
-                  <i class="bi bi-geo-alt"></i>
+                  <i class="bi bi-question-circle"></i>
                 </div>
                 <div class="info-content">
-                  <h3>Alamat Klinik</h3>
-                  <p>Jl. Kesehatan No. 18, Medan, Indonesia</p>
+                  <h3>Pertanyaan Umum</h3>
+                  <p>Tanya soal alur appointment, jadwal dokter, poli tersedia, atau cara mendaftar. Admin akan menjawab melalui email.</p>
                 </div>
               </div>
 
               <div class="contact-info-item" data-aos="fade-up" data-aos-delay="200">
                 <div class="info-icon">
-                  <i class="bi bi-envelope"></i>
+                  <i class="bi bi-exclamation-triangle"></i>
                 </div>
                 <div class="info-content">
-                  <h3>Email Klinik</h3>
-                  <p>info@medicare.test</p>
-                  <p>info@medicare.test</p>
+                  <h3>Keluhan Layanan</h3>
+                  <p>Sampaikan keluhan jika ada kendala dalam layanan, jadwal yang tidak sesuai, atau masalah pada sistem.</p>
                 </div>
               </div>
 
               <div class="contact-info-item" data-aos="fade-up" data-aos-delay="300">
                 <div class="info-icon">
-                  <i class="bi bi-headset"></i>
+                  <i class="bi bi-lightbulb"></i>
+                </div>
+                <div class="info-content">
+                  <h3>Saran &amp; Masukan</h3>
+                  <p>Ide dan saran Anda sangat berarti untuk meningkatkan kualitas layanan MediCare.</p>
+                </div>
+              </div>
+
+              <div class="contact-info-item" data-aos="fade-up" data-aos-delay="400">
+                <div class="info-icon">
+                  <i class="bi bi-clock"></i>
                 </div>
                 <div class="info-content">
                   <h3>Jam Operasional</h3>
-                  <p>Senin-Jumat: 08.00 - 17.00 WIB</p>
-                  <p>Sabtu: 08.00 - 13.00 WIB</p>
+                  <p>Senin–Jumat: 08.00–17.00 WIB</p>
+                  <p>Sabtu: 08.00–13.00 WIB</p>
                 </div>
               </div>
             </div>
@@ -162,30 +169,45 @@
 
           <div class="col-lg-7">
             <div class="contact-form-card" data-aos="fade-up" data-aos-delay="200">
-              <h2>Kirim Feedback / Pertanyaan</h2>
-              <p class="mb-4">Pesan akan masuk ke database dan bisa ditinjau admin melalui dashboard.</p>
+              <h2>Kirim Pesan</h2>
+              <p class="mb-4">Pilih kategori pesan Anda agar admin dapat merespons dengan tepat. Pesan akan masuk ke sistem dan dijawab melalui email dalam 1×24 jam.</p>
 
               <form id="feedbackForm" class="feedback-api-form">
                 <div class="row g-4">
-                  <div class="col-md-6">
-                    <input type="text" class="form-control" name="name" id="name" placeholder="Nama Anda" required>
+                  <div class="col-12">
+                    <label class="form-label fw-semibold">Kategori Pesan <span class="text-danger">*</span></label>
+                    <div class="d-flex flex-wrap gap-2" id="categoryBtns">
+                      <input type="hidden" name="category" id="categoryInput" value="pertanyaan">
+                      <button type="button" class="btn btn-category active" data-val="pertanyaan"><i class="bi bi-question-circle me-1"></i>Pertanyaan</button>
+                      <button type="button" class="btn btn-category" data-val="keluhan"><i class="bi bi-exclamation-triangle me-1"></i>Keluhan</button>
+                      <button type="button" class="btn btn-category" data-val="saran"><i class="bi bi-lightbulb me-1"></i>Saran</button>
+                      <button type="button" class="btn btn-category" data-val="lainnya"><i class="bi bi-chat me-1"></i>Lainnya</button>
+                    </div>
                   </div>
 
                   <div class="col-md-6">
-                    <input type="email" class="form-control" name="email" id="email" placeholder="Email Anda" required>
+                    <label class="form-label">Nama Anda <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="name" id="name" placeholder="Nama lengkap" required>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" name="email" id="email" placeholder="email@anda.com" required>
                   </div>
 
                   <div class="col-12">
-                    <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject" required>
+                    <label class="form-label">Subjek <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="subject" id="subject" placeholder="Ringkasan singkat pesan Anda" required>
                   </div>
 
                   <div class="col-12">
-                    <textarea class="form-control" name="message" id="message" placeholder="Pesan / feedback Anda" rows="6" required></textarea>
+                    <label class="form-label">Pesan <span class="text-danger">*</span></label>
+                    <textarea class="form-control" name="message" id="message" placeholder="Tulis pesan Anda secara lengkap di sini..." rows="6" required></textarea>
                   </div>
 
                   <div class="col-12">
                     <div id="feedbackMessage" class="message-box mb-3"></div>
-                    <button type="submit" class="btn btn-primary">Kirim Feedback</button>
+                    <button type="submit" class="btn btn-primary px-4"><i class="bi bi-send me-2"></i>Kirim Pesan</button>
                   </div>
                 </div>
               </form>

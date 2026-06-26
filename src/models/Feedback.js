@@ -16,6 +16,11 @@ const Feedback = sequelize.define('Feedback', {
     allowNull: false,
     validate: { isEmail: true }
   },
+  category: {
+    type: DataTypes.ENUM('pertanyaan', 'keluhan', 'saran', 'lainnya'),
+    defaultValue: 'pertanyaan',
+    allowNull: false
+  },
   subject: {
     type: DataTypes.STRING(150),
     allowNull: false

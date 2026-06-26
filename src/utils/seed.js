@@ -240,6 +240,7 @@ async function seedInitialData() {
     await Feedback.create({
       name: 'Andi Wijaya',
       email: 'andi@example.com',
+      category: 'pertanyaan',
       subject: 'Informasi layanan',
       message: 'Apakah klinik menerima appointment hari Sabtu?',
       status: 'new'

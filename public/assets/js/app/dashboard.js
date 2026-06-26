@@ -4,11 +4,59 @@ const Dashboard = (() => {
   let departments = [];
   let doctors = [];
   let appointments = [];
+  let allPatients = [];
+  let allFeedbacks = [];
+  let allCancellations = [];
   let conversations = [];
   let activeConversationId = null;
   let activeAdminConversationId = null;
   let patientConversationId = null;
   let socket = null;
+
+  const apptFilter    = { search: '', status: '', page: 1, perPage: 10 };
+  const csFilter      = { search: '', status: '' };
+  const patientFilter = { search: '', page: 1, perPage: 10 };
+  const feedbackFilter= { search: '', status: '', category: '' };
+  const cancelFilter  = { search: '' };
+  const doctorFilter  = { search: '' };
+
+  function filterItems(items, search, searchFns, extra = {}) {
+    let result = items;
+    const q = (search || '').toLowerCase().trim();
+    if (q) result = result.filter((item) => searchFns.some((fn) => String(fn(item) || '').toLowerCase().includes(q)));
+    if (extra.status) result = result.filter((item) => item.status === extra.status);
+    if (extra.category) result = result.filter((item) => item.category === extra.category);
+    return result;
+  }
+
+  function paginate(items, page, perPage) {
+    const total = items.length;
+    const pp = Number(perPage);
+    if (!pp) return { items, total, page: 1, pages: 1 };
+    const pages = Math.ceil(total / pp) || 1;
+    const safePage = Math.min(Math.max(page, 1), pages);
+    return { items: items.slice((safePage - 1) * pp, safePage * pp), total, page: safePage, pages };
+  }
+
+  function renderPager(containerId, state, total, pages, onPage) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    if (pages <= 1) { el.innerHTML = ''; return; }
+    const pp = Number(state.perPage);
+    const from = pp ? (state.page - 1) * pp + 1 : 1;
+    const to   = pp ? Math.min(state.page * pp, total) : total;
+    el.innerHTML = `
+      <span>${from}–${to} dari ${total}</span>
+      <div class="pager-btns">
+        <button onclick="${onPage}(${state.page - 1})" ${state.page <= 1 ? 'disabled' : ''}>&#8592; Prev</button>
+        <button onclick="${onPage}(${state.page + 1})" ${state.page >= pages ? 'disabled' : ''}>Next &#8594;</button>
+      </div>`;
+  }
+
+  function setCount(id, shown, total) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = shown < total ? `Menampilkan ${shown} dari ${total}` : `${total} item`;
+  }
 
   const dashboardMessage = () => document.getElementById('dashboardMessage');
 
@@ -148,6 +196,7 @@ const Dashboard = (() => {
       document.getElementById('csArea').classList.remove('d-none');
       document.querySelectorAll('.cs-admin-only').forEach((item) => item.classList.remove('d-none'));
       document.getElementById('openAppointmentBtn').innerHTML = '<i class="bi bi-inbox"></i> Buka Inbox CS';
+      document.getElementById('apiDocsNav').classList.add('d-none');
     }
     if (currentUser.role === 'pasien') {
       document.getElementById('patientAppointmentArea').classList.remove('d-none');
@@ -179,6 +228,9 @@ const Dashboard = (() => {
       if (payload?.conversationId === activeAdminConversationId) await openAdminConversation(activeAdminConversationId, false);
       if (payload?.conversationId === patientConversationId) await loadPatientMessages(patientConversationId);
       if (currentUser.role === 'customer_service' || currentUser.role === 'admin') await loadConversations();
+      if (currentUser.role === 'customer_service' && payload?.conversationId !== activeConversationId) {
+        showCsNotifToast(payload?.data?.Sender?.name || 'Pasien', payload?.data?.message || 'Pesan baru masuk');
+      }
     });
 
     socket.on('chat:closed', async (payload) => {
@@ -187,6 +239,21 @@ const Dashboard = (() => {
       if (payload?.conversationId === patientConversationId) await loadPatientMessages(patientConversationId);
       if (currentUser.role === 'customer_service' || currentUser.role === 'admin') await loadConversations();
     });
+  }
+
+  function showCsNotifToast(senderName, message) {
+    let container = document.getElementById('csNotifContainer');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'csNotifContainer';
+      container.className = 'cs-notif-container';
+      document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.className = 'cs-notif-toast';
+    toast.innerHTML = `<strong><i class="bi bi-chat-dots-fill me-1"></i>${escapeHtml(senderName)}</strong><div class="mt-1">${escapeHtml(shortText(message, 60))}</div>`;
+    container.appendChild(toast);
+    setTimeout(() => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 400); }, 4000);
   }
 
   function bindForms() {
@@ -444,41 +511,125 @@ const Dashboard = (() => {
   async function loadDoctors() {
     const result = await Api.request('/doctors?active=true');
     doctors = result.data || [];
-    const table = document.getElementById('doctorsTable');
-    if (table) {
-      table.innerHTML = doctors.map((item) => `
-        <tr>
-          <td><img src="${escapeHtml(item.image || 'assets/img/health/staff-1.webp')}" class="mini-doctor-avatar" alt=""> ${escapeHtml(item.name)}<br><small class="text-muted">${escapeHtml(item.specialization)}</small></td>
-          <td>${escapeHtml(item.Department?.name || '-')}</td>
-          <td>${escapeHtml(item.schedule || '-')}</td>
-        </tr>`).join('') || '<tr><td colspan="3" class="text-muted">Belum ada data.</td></tr>';
+    renderDoctorsTable();
+    const input = document.getElementById('doctorSearch');
+    if (input && !input.dataset.bound) {
+      input.dataset.bound = '1';
+      input.addEventListener('input', () => { doctorFilter.search = input.value; renderDoctorsTable(); });
     }
+  }
+
+  function renderDoctorsTable() {
+    const table = document.getElementById('doctorsTable');
+    if (!table) return;
+    const filtered = filterItems(doctors, doctorFilter.search, [(d) => d.name, (d) => d.specialization, (d) => d.Department?.name]);
+    setCount('doctorCount', filtered.length, doctors.length);
+    table.innerHTML = filtered.map((item) => `
+      <tr>
+        <td><img src="${escapeHtml(item.image || 'assets/img/health/staff-1.webp')}" class="mini-doctor-avatar" alt=""> ${escapeHtml(item.name)}<br><small class="text-muted">${escapeHtml(item.specialization)}</small></td>
+        <td>${escapeHtml(item.Department?.name || '-')}</td>
+        <td>${escapeHtml(item.schedule || '-')}</td>
+      </tr>`).join('') || '<tr><td colspan="3" class="text-muted">Belum ada data.</td></tr>';
   }
 
   async function loadPatients() {
     const result = await Api.request('/patients');
-    const patients = result.data || [];
+    allPatients = result.data || [];
+    patientFilter.page = 1;
+    renderPatientsTable();
+    ['patientSearch', 'patientPerPage'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el && !el.dataset.bound) {
+        el.dataset.bound = '1';
+        el.addEventListener('input', () => {
+          if (id === 'patientSearch') patientFilter.search = el.value;
+          if (id === 'patientPerPage') patientFilter.perPage = el.value;
+          patientFilter.page = 1;
+          renderPatientsTable();
+        });
+      }
+    });
+  }
+
+  function renderPatientsTable() {
     const table = document.getElementById('patientsTable');
-    table.innerHTML = patients.map((item) => `
+    if (!table) return;
+    const filtered = filterItems(allPatients, patientFilter.search, [
+      (p) => p.medicalRecordNumber, (p) => p.User?.name, (p) => p.User?.email
+    ]);
+    const { items, total, page, pages } = paginate(filtered, patientFilter.page, patientFilter.perPage);
+    patientFilter.page = page;
+    setCount('patientCount', filtered.length, allPatients.length);
+    table.innerHTML = items.map((item) => `
       <tr>
         <td>${escapeHtml(item.medicalRecordNumber)}</td>
         <td>${escapeHtml(item.User?.name || '-')}</td>
         <td>${escapeHtml(item.User?.email || '-')}</td>
         <td>${escapeHtml(item.User?.phone || '-')}</td>
-      </tr>`).join('') || '<tr><td colspan="4" class="text-muted">Belum ada data.</td></tr>';
+      </tr>`).join('') || '<tr><td colspan="4" class="text-muted text-center py-3">Tidak ada pasien yang cocok.</td></tr>';
+    renderPager('patientPager', patientFilter, total, pages, 'Dashboard.goPatientPage');
+  }
+
+  const categoryLabel = { pertanyaan: 'Pertanyaan', keluhan: 'Keluhan', saran: 'Saran', lainnya: 'Lainnya' };
+
+  function categoryBadge(cat) {
+    const key = cat || 'lainnya';
+    return `<span class="category-badge category-${key}">${categoryLabel[key] || key}</span>`;
+  }
+
+  function feedbackActions(item) {
+    const actions = [];
+    if (item.status === 'new') {
+      actions.push(`<button class="btn btn-outline-secondary btn-sm" onclick="Dashboard.updateFeedbackStatus(${item.id}, 'read')"><i class="bi bi-check2"></i> Tandai Dibaca</button>`);
+    }
+    if (item.status !== 'replied') {
+      actions.push(`<button class="btn btn-outline-success btn-sm" onclick="Dashboard.updateFeedbackStatus(${item.id}, 'replied')"><i class="bi bi-reply"></i> Sudah Dibalas</button>`);
+    }
+    actions.push(`<button class="btn btn-outline-danger btn-sm" onclick="Dashboard.deleteFeedback(${item.id})"><i class="bi bi-trash"></i></button>`);
+    return `<div class="d-flex flex-wrap gap-1">${actions.join('')}</div>`;
   }
 
   async function loadFeedbacks() {
     const result = await Api.request('/feedbacks');
-    const feedbacks = result.data || [];
+    allFeedbacks = result.data || [];
+    renderFeedbacksTable();
+    ['feedbackSearch', 'feedbackStatusFilter', 'feedbackCategoryFilter'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el && !el.dataset.bound) {
+        el.dataset.bound = '1';
+        el.addEventListener('input', () => {
+          if (id === 'feedbackSearch') feedbackFilter.search = el.value;
+          if (id === 'feedbackStatusFilter') feedbackFilter.status = el.value;
+          if (id === 'feedbackCategoryFilter') feedbackFilter.category = el.value;
+          renderFeedbacksTable();
+        });
+      }
+    });
+  }
+
+  function renderFeedbacksTable() {
     const table = document.getElementById('feedbacksTable');
-    table.innerHTML = feedbacks.map((item) => `
-      <tr>
-        <td>${escapeHtml(item.name)}<br><small class="text-muted">${escapeHtml(item.email)}</small></td>
-        <td>${escapeHtml(item.subject)}</td>
+    if (!table) return;
+    const filtered = filterItems(allFeedbacks, feedbackFilter.search,
+      [(f) => f.name, (f) => f.subject, (f) => f.email],
+      { status: feedbackFilter.status, category: feedbackFilter.category }
+    );
+    setCount('feedbackCount', filtered.length, allFeedbacks.length);
+    table.innerHTML = filtered.map((item) => `
+      <tr class="${item.status === 'new' ? 'table-warning' : ''}">
+        <td>
+          <strong>${escapeHtml(item.name)}</strong><br>
+          <small class="text-muted">${escapeHtml(item.email)}</small><br>
+          <small class="text-muted">${new Date(item.createdAt).toLocaleDateString('id-ID')}</small>
+        </td>
+        <td>${categoryBadge(item.category)}</td>
+        <td>
+          <div class="fw-semibold">${escapeHtml(item.subject)}</div>
+          <div class="feedback-msg-preview">${escapeHtml(item.message)}</div>
+        </td>
         <td>${statusPill(item.status)}</td>
-        <td><button class="btn btn-outline-primary btn-sm" onclick="Dashboard.updateFeedbackStatus(${item.id}, 'read')">Read</button></td>
-      </tr>`).join('') || '<tr><td colspan="4" class="text-muted">Belum ada feedback.</td></tr>';
+        <td>${feedbackActions(item)}</td>
+      </tr>`).join('') || '<tr><td colspan="5" class="text-center text-muted py-3">Tidak ada pesan yang cocok.</td></tr>';
   }
 
   async function updateFeedbackStatus(id, status) {
@@ -490,37 +641,90 @@ const Dashboard = (() => {
     }
   }
 
+  async function deleteFeedback(id) {
+    try {
+      await Api.request(`/feedbacks/${id}`, { method: 'DELETE' });
+      await loadFeedbacks();
+    } catch (error) {
+      Api.showMessage(dashboardMessage(), error.message, 'error');
+    }
+  }
+
   async function loadCancellations() {
     if (currentUser?.role !== 'admin') return;
     const result = await Api.request('/appointments/cancellations');
-    const data = result.data || [];
+    allCancellations = result.data || [];
+    renderCancellationsTable();
+    const input = document.getElementById('cancelSearch');
+    if (input && !input.dataset.bound) {
+      input.dataset.bound = '1';
+      input.addEventListener('input', () => { cancelFilter.search = input.value; renderCancellationsTable(); });
+    }
+  }
+
+  function renderCancellationsTable() {
     const table = document.getElementById('cancellationsTable');
     if (!table) return;
-    table.innerHTML = data.map((item) => `
+    const filtered = filterItems(allCancellations, cancelFilter.search, [
+      (c) => c.patientName, (c) => c.Doctor?.name, (c) => c.Appointment?.Doctor?.name
+    ]);
+    setCount('cancelCount', filtered.length, allCancellations.length);
+    table.innerHTML = filtered.map((item) => `
       <tr>
         <td>#${item.appointmentId}</td>
         <td>${escapeHtml(item.patientName)}<br><small class="text-muted">${escapeHtml(item.patientNumber || '-')}</small></td>
         <td>${escapeHtml(item.Doctor?.name || item.Appointment?.Doctor?.name || '-')}<br><small class="text-muted">${escapeHtml(item.Doctor?.Department?.name || '-')}</small></td>
         <td>${escapeHtml(item.reason)}</td>
         <td>${escapeHtml(formatDateTime(item.createdAt))}</td>
-      </tr>`).join('') || '<tr><td colspan="5" class="text-muted">Belum ada alasan cancel dokter.</td></tr>';
+      </tr>`).join('') || '<tr><td colspan="5" class="text-muted text-center py-3">Tidak ada data cancel.</td></tr>';
   }
 
   async function loadAppointments() {
     const result = await Api.request('/appointments');
     appointments = result.data || [];
+    apptFilter.page = 1;
     renderAppointmentsTable();
     renderCsInbox();
+    ['apptSearch', 'apptStatusFilter', 'apptPerPage'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el && !el.dataset.bound) {
+        el.dataset.bound = '1';
+        el.addEventListener('input', () => {
+          if (id === 'apptSearch') apptFilter.search = el.value;
+          if (id === 'apptStatusFilter') apptFilter.status = el.value;
+          if (id === 'apptPerPage') apptFilter.perPage = el.value;
+          apptFilter.page = 1;
+          renderAppointmentsTable();
+        });
+      }
+    });
+    ['csInboxSearch', 'csInboxStatusFilter'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el && !el.dataset.bound) {
+        el.dataset.bound = '1';
+        el.addEventListener('input', () => {
+          if (id === 'csInboxSearch') csFilter.search = el.value;
+          if (id === 'csInboxStatusFilter') csFilter.status = el.value;
+          renderCsInbox();
+        });
+      }
+    });
   }
 
   function renderAppointmentsTable() {
     const table = document.getElementById('appointmentsTable');
     if (!table) return;
-    const headRow = table.closest('table').querySelector('thead tr');
+    const headRow = document.getElementById('apptHeadRow') || table.closest('table').querySelector('thead tr');
+
+    const searchFns = [(a) => a.patientName, (a) => a.Doctor?.name, (a) => a.Department?.name];
+    const filtered = filterItems(appointments, apptFilter.search, searchFns, { status: apptFilter.status });
 
     if (currentUser.role === 'dokter') {
-      headRow.innerHTML = '<th>ID</th><th>Nama Pasien</th><th>No. RM</th><th>Keluhan</th><th>Jadwal</th><th>Status</th><th>Aksi</th>';
-      table.innerHTML = appointments.map((item) => `
+      if (headRow) headRow.innerHTML = '<th>ID</th><th>Nama Pasien</th><th>No. RM</th><th>Keluhan</th><th>Jadwal</th><th>Status</th><th>Aksi</th>';
+      const { items, total, page, pages } = paginate(filtered, apptFilter.page, apptFilter.perPage);
+      apptFilter.page = page;
+      setCount('apptCount', filtered.length, appointments.length);
+      table.innerHTML = items.map((item) => `
         <tr>
           <td>#${item.id}</td>
           <td>${escapeHtml(item.patientName)}<br><small class="text-muted">${escapeHtml(item.email || '-')}</small></td>
@@ -529,12 +733,36 @@ const Dashboard = (() => {
           <td>${formatDate(item.appointmentDate)} ${formatTime(item.appointmentTime)}</td>
           <td>${statusPill(item.status)}</td>
           <td>${renderDoctorAction(item)}</td>
-        </tr>`).join('') || '<tr><td colspan="7" class="text-muted">Belum ada appointment untuk dokter ini.</td></tr>';
+        </tr>`).join('') || '<tr><td colspan="7" class="text-muted text-center py-3">Tidak ada appointment yang cocok.</td></tr>';
+      renderPager('apptPager', apptFilter, total, pages, 'Dashboard.goApptPage');
       return;
     }
 
-    headRow.innerHTML = '<th>ID</th><th>Pasien</th><th>No. RM</th><th>Keluhan</th><th>Poli</th><th>Dokter</th><th>Jadwal</th><th>Status</th><th>Aksi</th>';
-    table.innerHTML = appointments.map((item) => `
+    if (currentUser.role === 'pasien') {
+      if (headRow) headRow.innerHTML = '<th>ID</th><th>Pasien</th><th>No. RM</th><th>Keluhan</th><th>Poli</th><th>Dokter</th><th>Jadwal</th><th>Status</th>';
+      const { items, total, page, pages } = paginate(filtered, apptFilter.page, apptFilter.perPage);
+      apptFilter.page = page;
+      setCount('apptCount', filtered.length, appointments.length);
+      table.innerHTML = items.map((item) => `
+        <tr>
+          <td>#${item.id}</td>
+          <td>${escapeHtml(item.patientName)}<br><small class="text-muted">${escapeHtml(item.email)}</small></td>
+          <td>${escapeHtml(item.patientNumber || item.Patient?.medicalRecordNumber || '-')}</td>
+          <td title="${escapeHtml(item.symptoms || '')}">${escapeHtml(shortText(item.symptoms, 55))}</td>
+          <td>${escapeHtml(item.Department?.name || item.Doctor?.Department?.name || '-')}</td>
+          <td>${escapeHtml(item.Doctor?.name || '-')}</td>
+          <td>${formatDate(item.appointmentDate)} ${formatTime(item.appointmentTime)}</td>
+          <td>${statusPill(item.status)}</td>
+        </tr>`).join('') || '<tr><td colspan="8" class="text-muted text-center py-3">Tidak ada appointment yang cocok.</td></tr>';
+      renderPager('apptPager', apptFilter, total, pages, 'Dashboard.goApptPage');
+      return;
+    }
+
+    if (headRow) headRow.innerHTML = '<th>ID</th><th>Pasien</th><th>No. RM</th><th>Keluhan</th><th>Poli</th><th>Dokter</th><th>Jadwal</th><th>Status</th><th>Aksi</th>';
+    const { items, total, page, pages } = paginate(filtered, apptFilter.page, apptFilter.perPage);
+    apptFilter.page = page;
+    setCount('apptCount', filtered.length, appointments.length);
+    table.innerHTML = items.map((item) => `
       <tr>
         <td>#${item.id}</td>
         <td>${escapeHtml(item.patientName)}<br><small class="text-muted">${escapeHtml(item.email)}</small></td>
@@ -545,13 +773,13 @@ const Dashboard = (() => {
         <td>${formatDate(item.appointmentDate)} ${formatTime(item.appointmentTime)}</td>
         <td>${statusPill(item.status)}</td>
         <td>${renderAppointmentAction(item)}</td>
-      </tr>`).join('') || '<tr><td colspan="9" class="text-muted">Belum ada appointment.</td></tr>';
+      </tr>`).join('') || '<tr><td colspan="9" class="text-muted text-center py-3">Tidak ada appointment yang cocok.</td></tr>';
+    renderPager('apptPager', apptFilter, total, pages, 'Dashboard.goApptPage');
   }
 
   function renderAppointmentAction(item) {
     if (currentUser.role === 'customer_service') return renderChatButton(item);
-    if (currentUser.role === 'admin') return '<span class="text-muted">Monitoring</span>';
-    return '<span class="text-muted">-</span>';
+    return '<span class="text-muted">Monitoring</span>';
   }
 
   function renderChatButton(item) {
@@ -702,7 +930,9 @@ const Dashboard = (() => {
   function renderCsInbox() {
     const table = document.getElementById('csInboxTable');
     if (!table) return;
-    const data = appointments.filter((item) => ['pending', 'requested', 'scheduled'].includes(item.status));
+    const base = appointments.filter((item) => ['pending', 'requested', 'scheduled'].includes(item.status));
+    const data = filterItems(base, csFilter.search, [(a) => a.patientName, (a) => a.patientNumber], { status: csFilter.status });
+    setCount('csInboxCount', data.length, base.length);
     table.innerHTML = data.map((item) => {
       const departmentId = item.departmentId || item.Doctor?.departmentId || '';
       const canSend = item.status === 'pending';
@@ -727,7 +957,7 @@ const Dashboard = (() => {
         <td>${renderChatButton(item)}</td>
         <td>${sendContent}</td>
       </tr>`;
-    }).join('') || '<tr><td colspan="7" class="text-muted">Tidak ada request appointment baru.</td></tr>';
+    }).join('') || '<tr><td colspan="7" class="text-muted text-center py-3">Tidak ada request yang cocok.</td></tr>';
   }
 
   async function assignAppointment(id) {
@@ -867,6 +1097,9 @@ const Dashboard = (() => {
     renderMessages('patientChatMessages', result.data || []);
   }
 
+  function goApptPage(n) { apptFilter.page = n; renderAppointmentsTable(); }
+  function goPatientPage(n) { patientFilter.page = n; renderPatientsTable(); }
+
   return {
     init,
     loadAppointments,
@@ -876,10 +1109,13 @@ const Dashboard = (() => {
     loadFeedbacks,
     loadCancellations,
     updateFeedbackStatus,
+    deleteFeedback,
     updateAppointmentStatus,
     loadConversations,
     openConversation,
-    openAdminConversation
+    openAdminConversation,
+    goApptPage,
+    goPatientPage
   };
 })();
 

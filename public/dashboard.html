@@ -22,7 +22,7 @@
           <li class="nav-item"><a class="nav-link" href="#appointmentSection">Appointment</a></li>
           <li class="nav-item cs-admin-only d-none"><a class="nav-link" href="#csArea">CS Inbox</a></li>
           <li class="nav-item admin-only d-none"><a class="nav-link" href="#adminArea">Admin Area</a></li>
-          <li class="nav-item"><a class="nav-link" href="api-docs">API Docs</a></li>
+          <li class="nav-item" id="apiDocsNav"><a class="nav-link" href="api-docs">API Docs</a></li>
           <li class="nav-item"><span id="roleBadge" class="role-badge">Role</span></li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -100,24 +100,33 @@
         </div>
         <button class="btn btn-outline-primary btn-sm" onclick="Dashboard.loadAppointments()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
       </div>
-      <div class="table-responsive">
-        <table class="table table-hover align-middle">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Pasien</th>
-              <th>No. RM</th>
-              <th>Keluhan</th>
-              <th>Poli</th>
-              <th>Dokter</th>
-              <th>Jadwal</th>
-              <th>Status</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
+      <div class="table-filter-bar">
+        <input type="search" class="form-control" id="apptSearch" placeholder="Cari nama pasien...">
+        <select class="form-select" id="apptStatusFilter">
+          <option value="">Semua Status</option>
+          <option value="pending">Pending</option>
+          <option value="requested">Requested</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <select class="form-select" id="apptPerPage" style="min-width:110px">
+          <option value="10">10 baris</option>
+          <option value="25">25 baris</option>
+          <option value="0">Semua</option>
+        </select>
+        <span id="apptCount" class="filter-count"></span>
+      </div>
+      <div class="table-scroll-wrap">
+        <table class="table table-hover align-middle mb-0">
+          <thead><tr id="apptHeadRow">
+            <th>ID</th><th>Pasien</th><th>No. RM</th><th>Keluhan</th>
+            <th>Poli</th><th>Dokter</th><th>Jadwal</th><th>Status</th><th>Aksi</th>
+          </tr></thead>
           <tbody id="appointmentsTable"></tbody>
         </table>
       </div>
+      <div id="apptPager" class="table-pager"></div>
     </section>
 
     <section id="csArea" class="d-none mb-4">
@@ -131,8 +140,18 @@
               </div>
               <button class="btn btn-outline-primary btn-sm" onclick="Dashboard.loadAppointments()">Refresh</button>
             </div>
-            <div class="table-responsive">
-              <table class="table table-sm align-middle">
+            <div class="table-filter-bar">
+              <input type="search" class="form-control" id="csInboxSearch" placeholder="Cari nama pasien...">
+              <select class="form-select" id="csInboxStatusFilter">
+                <option value="">Semua</option>
+                <option value="pending">Pending</option>
+                <option value="requested">Requested</option>
+                <option value="scheduled">Scheduled</option>
+              </select>
+              <span id="csInboxCount" class="filter-count"></span>
+            </div>
+            <div class="table-scroll-wrap">
+              <table class="table table-sm align-middle mb-0">
                 <thead><tr><th>Pasien</th><th>Keluhan</th><th>Poli</th><th>Dokter</th><th>Status</th><th>Live Chat</th><th>Kirim Request</th></tr></thead>
                 <tbody id="csInboxTable"></tbody>
               </table>
@@ -149,7 +168,7 @@
             <div id="csConversationList" class="conversation-list"></div>
           </div>
         </div>
-        <div class="col-lg-8">
+        <div class="col-lg-8 cs-chat-col">
           <div class="table-card h-100 chat-panel-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <div>
@@ -245,8 +264,8 @@
               <div class="col-12"><input class="form-control" name="description" placeholder="Deskripsi" required></div>
               <div class="col-12"><button class="btn btn-primary btn-sm">Tambah Poli</button></div>
             </form>
-            <div class="table-responsive">
-              <table class="table table-sm align-middle">
+            <div class="table-scroll-wrap" style="max-height:240px">
+              <table class="table table-sm align-middle mb-0">
                 <thead><tr><th>Poli</th><th>Lokasi</th><th>Status</th></tr></thead>
                 <tbody id="departmentsTable"></tbody>
               </table>
@@ -270,8 +289,12 @@
               <div class="col-12 form-check ms-2"><input class="form-check-input" type="checkbox" name="createLogin" id="createLogin"><label class="form-check-label" for="createLogin">Buat akun login dokter</label></div>
               <div class="col-12"><button class="btn btn-primary btn-sm">Tambah Dokter</button></div>
             </form>
-            <div class="table-responsive">
-              <table class="table table-sm align-middle">
+            <div class="table-filter-bar">
+              <input type="search" class="form-control" id="doctorSearch" placeholder="Cari nama / spesialisasi...">
+              <span id="doctorCount" class="filter-count"></span>
+            </div>
+            <div class="table-scroll-wrap" style="max-height:260px">
+              <table class="table table-sm align-middle mb-0">
                 <thead><tr><th>Dokter</th><th>Poli</th><th>Jadwal</th></tr></thead>
                 <tbody id="doctorsTable"></tbody>
               </table>
@@ -285,24 +308,54 @@
               <h3 class="admin-section-title mb-0">Data Pasien</h3>
               <button class="btn btn-outline-primary btn-sm" onclick="Dashboard.loadPatients()">Refresh</button>
             </div>
-            <div class="table-responsive">
-              <table class="table table-sm align-middle">
+            <div class="table-filter-bar">
+              <input type="search" class="form-control" id="patientSearch" placeholder="Cari nama / No. RM / email...">
+              <select class="form-select" id="patientPerPage" style="min-width:110px">
+                <option value="10">10 baris</option>
+                <option value="25">25 baris</option>
+                <option value="0">Semua</option>
+              </select>
+              <span id="patientCount" class="filter-count"></span>
+            </div>
+            <div class="table-scroll-wrap">
+              <table class="table table-sm align-middle mb-0">
                 <thead><tr><th>No RM</th><th>Nama</th><th>Email</th><th>Telepon</th></tr></thead>
                 <tbody id="patientsTable"></tbody>
               </table>
             </div>
+            <div id="patientPager" class="table-pager"></div>
           </div>
         </div>
 
-        <div class="col-lg-6">
-          <div class="table-card h-100">
+        <div class="col-12">
+          <div class="table-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
-              <h3 class="admin-section-title mb-0">Contact / Feedback</h3>
+              <div>
+                <h3 class="admin-section-title mb-1">Pesan Masuk (Contact &amp; Feedback)</h3>
+                <p class="text-muted mb-0">Pesan dari pengunjung melalui halaman Hubungi Kami. Tandai sudah dibaca atau sudah dibalas.</p>
+              </div>
               <button class="btn btn-outline-primary btn-sm" onclick="Dashboard.loadFeedbacks()">Refresh</button>
             </div>
-            <div class="table-responsive">
-              <table class="table table-sm align-middle">
-                <thead><tr><th>Nama</th><th>Subject</th><th>Status</th><th>Aksi</th></tr></thead>
+            <div class="table-filter-bar">
+              <input type="search" class="form-control" id="feedbackSearch" placeholder="Cari nama / subjek...">
+              <select class="form-select" id="feedbackCategoryFilter">
+                <option value="">Semua Kategori</option>
+                <option value="pertanyaan">Pertanyaan</option>
+                <option value="keluhan">Keluhan</option>
+                <option value="saran">Saran</option>
+                <option value="lainnya">Lainnya</option>
+              </select>
+              <select class="form-select" id="feedbackStatusFilter">
+                <option value="">Semua Status</option>
+                <option value="new">Baru</option>
+                <option value="read">Dibaca</option>
+                <option value="replied">Dibalas</option>
+              </select>
+              <span id="feedbackCount" class="filter-count"></span>
+            </div>
+            <div class="table-scroll-wrap">
+              <table class="table table-sm align-middle mb-0">
+                <thead><tr><th>Pengirim</th><th>Kategori</th><th>Subject &amp; Pesan</th><th>Status</th><th>Aksi</th></tr></thead>
                 <tbody id="feedbacksTable"></tbody>
               </table>
             </div>
@@ -319,8 +372,12 @@
               </div>
               <button class="btn btn-outline-primary btn-sm" onclick="Dashboard.loadCancellations()">Refresh</button>
             </div>
-            <div class="table-responsive">
-              <table class="table table-sm align-middle">
+            <div class="table-filter-bar">
+              <input type="search" class="form-control" id="cancelSearch" placeholder="Cari nama pasien / dokter...">
+              <span id="cancelCount" class="filter-count"></span>
+            </div>
+            <div class="table-scroll-wrap">
+              <table class="table table-sm align-middle mb-0">
                 <thead><tr><th>Appointment</th><th>Pasien</th><th>Dokter</th><th>Alasan Cancel</th><th>Waktu</th></tr></thead>
                 <tbody id="cancellationsTable"></tbody>
               </table>

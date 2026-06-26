@@ -8,11 +8,14 @@ const asyncHandler = require('../utils/asyncHandler');
 const router = express.Router();
 
 router.post('/', validate(['name', 'email', 'subject', 'message']), asyncHandler(async (req, res) => {
-  const { name, email, subject, message } = req.body;
+  const { name, email, subject, message, category } = req.body;
   if (!validateEmail(email)) return res.status(400).json({ message: 'Format email tidak valid.' });
 
-  const feedback = await Feedback.create({ name, email, subject, message });
-  res.status(201).json({ message: 'Pesan berhasil dikirim. Admin akan meninjau feedback Anda.', data: feedback });
+  const allowedCategories = ['pertanyaan', 'keluhan', 'saran', 'lainnya'];
+  const safeCategory = allowedCategories.includes(category) ? category : 'pertanyaan';
+
+  const feedback = await Feedback.create({ name, email, category: safeCategory, subject, message });
+  res.status(201).json({ message: 'Pesan Anda berhasil dikirim dan akan ditinjau oleh admin.', data: feedback });
 }));
 
 router.get('/', auth, authorize('admin'), asyncHandler(async (req, res) => {
