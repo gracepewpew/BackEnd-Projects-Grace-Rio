@@ -66,14 +66,17 @@ INOVASI DAN KREATIVITAS
    - User bisa upload foto profile langsung dari dashboard.
    - File disimpan di server dengan validasi tipe file dan ukuran.
 
-5. Swagger UI Dokumentasi API:
+5. Swagger UI Dokumentasi API (Admin Only):
    - Dokumentasi REST API interaktif tersedia di /api-docs.
    - Setiap endpoint terdokumentasi dengan method, parameter, dan response.
+   - Akses dibatasi hanya untuk role Admin melalui verifikasi JWT di backend.
+   - Role lain (Pasien, Dokter, CS) tidak dapat membuka halaman dokumentasi.
 
 6. Keamanan Berlapis:
    - Rate limiting 150 request/15 menit pada endpoint auth.
    - Helmet untuk security headers.
    - Validasi input di backend untuk semua field penting.
+   - Proteksi route /api-docs di level server dengan JWT + role check.
 
 7. Contact & Feedback Berkategori:
    - Halaman kontak dengan 4 kategori pesan: Pertanyaan, Keluhan, Saran, Lainnya.

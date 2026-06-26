@@ -1,35 +1,35 @@
-# MediCare Clinic UAS — Real-Time Multi-Role
+ MediCare Clinic UAS — Real-Time Multi-Role
 
-Project UAS berbasis template **Clinic-1.0.0** yang dikembangkan menjadi aplikasi web klinik lengkap dengan backend Express.js, REST API, MySQL, authentication, authorization, dashboard role-based, live chat real-time, appointment workflow multi-peran, contact/feedback berkategori, dan adjustable list view pada semua tabel.
+Project UAS berbasis template Clinic-1.0.0 yang dikembangkan menjadi aplikasi web klinik lengkap dengan backend Express.js, REST API, MySQL, authentication, authorization, dashboard role-based, live chat real-time, appointment workflow multi-peran, contact/feedback berkategori, dan adjustable list view pada semua tabel.
 
-## Fitur Utama
+ Fitur Utama
 
-1. **Login & Register Pasien**
+1. Login & Register Pasien
    - Register pasien baru dengan validasi email, telepon, dan password.
    - Password memakai show/hide icon mata dan kolom Re-enter Password.
    - Password di-hash menggunakan bcrypt, token menggunakan JWT.
 
-2. **Multi-Role (4 Role)**
+2. Multi-Role (4 Role)
    - Admin, Pasien, Dokter, Customer Service.
    - Setiap role melihat tampilan dan data yang berbeda.
 
-3. **Buka Banyak User Bersamaan**
+3. Buka Banyak User Bersamaan
    - Token disimpan di `sessionStorage`, bukan `localStorage`.
    - 1 browser bisa membuka banyak tab/window dengan login berbeda sekaligus.
    - Cocok untuk demo real-time (Pasien, CS, Dokter, Admin di tab berbeda).
 
-4. **Profile User**
+4. Profile User
    - Ubah nama, email, nomor telepon, dan foto profile melalui upload file.
    - Pasien bisa mengubah data tambahan: tanggal lahir, gender, golongan darah, alamat.
 
-5. **Appointment Workflow Multi-Peran (5 Status)**
-   - Pasien mengirim nama, No. RM, dan keluhan → status **PENDING**.
-   - Customer Service memilih poli lalu dokter sesuai poli → status **REQUESTED**.
-   - Dokter menentukan tanggal dan jam → status **SCHEDULED**.
-   - Dokter menandai selesai → **COMPLETED** / **CANCELLED**.
+5. Appointment Workflow Multi-Peran (5 Status)
+   - Pasien mengirim nama, No. RM, dan keluhan → status PENDING.
+   - Customer Service memilih poli lalu dokter sesuai poli → status REQUESTED.
+   - Dokter menentukan tanggal dan jam → status SCHEDULED.
+   - Dokter menandai selesai → COMPLETED / CANCELLED.
    - Jika cancel, dokter wajib isi alasan dan tercatat di riwayat admin.
 
-6. **Customer Service Dashboard**
+6. Customer Service Dashboard
    - Inbox appointment pasien dengan filter dan pencarian.
    - Pilih poli terlebih dahulu, dokter muncul otomatis sesuai poli.
    - Membalas live chat pasien secara real-time.
@@ -37,39 +37,42 @@ Project UAS berbasis template **Clinic-1.0.0** yang dikembangkan menjadi aplikas
    - Notifikasi toast muncul otomatis jika ada pesan dari percakapan lain.
    - Mengakhiri obrolan; history tersimpan dan bisa dilihat admin.
 
-7. **Live Chat Real-Time (Socket.IO)**
+7. Live Chat Real-Time (Socket.IO)
    - Pasien punya bubble chat di kanan bawah dashboard seperti WhatsApp.
    - CS membalas pesan secara real-time.
    - Admin bisa membuka history seluruh percakapan.
    - Notifikasi real-time untuk appointment dan chat ke semua role.
 
-8. **Contact & Feedback Berkategori**
+8. Contact & Feedback Berkategori
    - Halaman kontak dengan 4 kategori: Pertanyaan, Keluhan, Saran, Lainnya.
    - Kategori dipilih via tombol pill dan disimpan di database.
    - Tabel admin menampilkan badge warna per kategori.
    - Admin dapat filter per kategori dan status (Baru/Dibaca/Dibalas).
    - Tombol aksi: Tandai Dibaca, Sudah Dibalas, Hapus.
 
-9. **Adjustable List View pada Semua Tabel**
+9. Adjustable List View pada Semua Tabel
    - Setiap tabel punya kolom pencarian, filter status/kategori, dan pilihan jumlah baris (10/25/Semua).
    - Area scroll terbatas dengan header kolom yang selalu terlihat (sticky).
    - Pagination Prev/Next otomatis muncul jika data melebihi batas per halaman.
    - Filter bekerja langsung di sisi klien tanpa reload halaman.
 
-10. **Upload Foto Profile**
+10. Upload Foto Profile
     - Upload langsung dari dashboard dengan validasi tipe file (JPG/PNG/WEBP/GIF) dan ukuran maksimal 2 MB.
 
-11. **Swagger UI Dokumentasi API**
+11. Swagger UI Dokumentasi API (Admin Only)
     - Dokumentasi REST API interaktif tersedia di `/api-docs`.
+    - Akses dibatasi hanya untuk role Admin — diproteksi di level server dengan verifikasi JWT.
+    - Role lain (Pasien, Dokter, CS) tidak melihat link API Docs dan akan ditolak jika mengakses langsung.
 
-12. **Keamanan Berlapis**
+12. Keamanan Berlapis
     - Rate limiting 150 request/15 menit pada endpoint auth.
     - Helmet untuk security headers.
     - Validasi input di backend untuk semua field penting.
+    - Proteksi route `/api-docs` di level server dengan JWT + role check.
 
-## Teknologi
+ Teknologi
 
-**Back-End:**
+Back-End:
 - Node.js + Express.js, MySQL, Sequelize ORM
 - JWT Authentication, bcryptjs
 - Socket.IO (real-time appointment & live chat)
@@ -77,19 +80,19 @@ Project UAS berbasis template **Clinic-1.0.0** yang dikembangkan menjadi aplikas
 - Helmet, CORS, Morgan, express-rate-limit, dotenv
 - Swagger UI Express
 
-**Front-End:**
+Front-End:
 - HTML, CSS, JavaScript (Vanilla), Bootstrap 5, Socket.IO Client
 - Template: Clinic Bootstrap Template (Clinic-1.0.0)
 
-## Cara Menjalankan
+ Cara Menjalankan
 
-### 1. Install dependency
+ 1. Install dependency
 
 ```bash
 npm install
 ```
 
-### 2. Buat file `.env`
+ 2. Buat file `.env`
 
 Buat file baru bernama `.env` di root project, isi dengan:
 
@@ -106,7 +109,7 @@ JWT_EXPIRES_IN=1d
 
 > Sesuaikan `DB_PASS` dengan password MySQL lokal. Jika tidak ada password, kosongkan saja.
 
-### 3. Import database
+ 3. Import database
 
 ```bash
 mysql -u root < database/database.sql
@@ -114,7 +117,7 @@ mysql -u root < database/database.sql
 
 > File SQL sudah berisi perintah `CREATE DATABASE` dan `USE clinic_uas` secara otomatis.
 
-### 4. Jalankan server
+ 4. Jalankan server
 
 ```bash
 npm run dev
@@ -125,12 +128,12 @@ Buka browser:
 ```
 http://localhost:8888          ← halaman utama
 http://localhost:8888/login.html
-http://localhost:8888/api-docs ← Swagger
+http://localhost:8888/api-docs ← Swagger (login admin dulu, link tersedia di dashboard)
 ```
 
 > Database akan di-sync otomatis via Sequelize saat server start. Seed data (akun demo, dokter, poli, pasien) dibuat otomatis jika belum ada.
 
-## Akun Demo
+ Akun Demo
 
 | Role | Email | Password |
 |---|---|---|
@@ -146,19 +149,19 @@ http://localhost:8888/api-docs ← Swagger
 | Dokter | robert.martinez@clinic.test | doctor12345 |
 | Dokter | jennifer.lee@clinic.test | doctor12345 |
 
-## Cara Demo Real-Time
+ Cara Demo Real-Time
 
-1. Buka **Tab 1** → login sebagai `pasien@clinic.test`
-2. Buka **Tab 2** → login sebagai `cs@clinic.test`
-3. Buka **Tab 3** → login sebagai `marcus@clinic.test`
+1. Buka Tab 1 → login sebagai `pasien@clinic.test`
+2. Buka Tab 2 → login sebagai `cs@clinic.test`
+3. Buka Tab 3 → login sebagai `marcus@clinic.test`
 4. Di tab pasien, buat appointment dari dashboard.
-5. Di tab CS, request muncul langsung di inbox → pilih poli → pilih dokter → klik **Kirim ke Dokter**. Status: REQUESTED.
-6. Di tab dokter, appointment muncul otomatis → pilih tanggal & jam → klik **Jadwalkan**. Status: SCHEDULED.
-7. Dokter klik **Complete** atau **Cancel** (jika cancel, wajib isi alasan).
+5. Di tab CS, request muncul langsung di inbox → pilih poli → pilih dokter → klik Kirim ke Dokter. Status: REQUESTED.
+6. Di tab dokter, appointment muncul otomatis → pilih tanggal & jam → klik Jadwalkan. Status: SCHEDULED.
+7. Dokter klik Complete atau Cancel (jika cancel, wajib isi alasan).
 8. Di tab pasien, klik bubble chat kanan bawah → chat dengan CS.
 9. CS mengakhiri chat → Admin bisa lihat history.
 
-## Endpoint REST API Utama
+ Endpoint REST API Utama
 
 | Method | Endpoint | Keterangan |
 |---|---|---|
@@ -192,16 +195,16 @@ http://localhost:8888/api-docs ← Swagger
 | POST | `/api/chat/conversations/:id/messages` | Kirim pesan chat |
 | PATCH | `/api/chat/conversations/:id/close` | CS/Admin akhiri chat |
 
-## Pembagian Fitur
+ Pembagian Fitur
 
-### Anggota 1 — Rio Frederich (211112075)
+ Anggota 1 — Rio Frederich (211112075)
 - Authentication & authorization (JWT, bcrypt).
 - Register/login & profile user.
 - Data pasien & nomor rekam medis.
 - Middleware: auth, role, validation, error handler.
 - Upload foto profile.
 
-### Anggota 2 — Grace Putri Wijaya (211110121)
+ Anggota 2 — Grace Putri Wijaya (211110121)
 - Appointment workflow multi-peran (5 status).
 - Customer Service dashboard & inbox.
 - Live chat real-time (Socket.IO).
@@ -210,6 +213,6 @@ http://localhost:8888/api-docs ← Swagger
 - Adjustable list view & dashboard admin.
 - Hosting di Railway.
 
-## Catatan
+ Catatan
 
 Folder `forms/` dan file PHP bawaan template tidak digunakan. Semua form memakai JavaScript `fetch()` ke REST API Node.js. Real-time menggunakan Socket.IO.
