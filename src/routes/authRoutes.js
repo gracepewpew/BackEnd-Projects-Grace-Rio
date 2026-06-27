@@ -63,9 +63,17 @@ router.post('/register', validate(['name', 'email', 'password', 'confirmPassword
   }
 
   const user = await User.create({ name, email, password, phone, profilePhoto: profilePhoto || null, role: 'pasien' });
+
+  const lastPatient = await Patient.findOne({ order: [['id', 'DESC']] });
+  let nextRmNum = 1;
+  if (lastPatient?.medicalRecordNumber) {
+    const match = lastPatient.medicalRecordNumber.match(/(\d+)$/);
+    if (match) nextRmNum = parseInt(match[1], 10) + 1;
+  }
+
   await Patient.create({
     userId: user.id,
-    medicalRecordNumber: `RM-${String(user.id).padStart(5, '0')}`,
+    medicalRecordNumber: `RM-${String(nextRmNum).padStart(5, '0')}`,
     birthDate: birthDate || null,
     gender: gender || null,
     bloodType: bloodType || null,

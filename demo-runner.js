@@ -14,8 +14,16 @@
 
 const { chromium } = require('playwright');
 const readline = require('readline');
+const http = require('http');
 
 const BASE = 'http://localhost:8888';
+
+function checkServer() {
+  return new Promise((resolve) => {
+    http.get(`${BASE}/index.html`, (res) => resolve(res.statusCode < 500))
+      .on('error', () => resolve(false));
+  });
+}
 const REG_EMAIL = `demo.baru.${Date.now()}@test.com`;
 
 // ─── Terminal helpers ─────────────────────────────────────────────────────────
@@ -114,9 +122,21 @@ async function main() {
   console.log(`\n${BOLD}${MAGENTA}╔══════════════════════════════════════╗${R}`);
   console.log(`${BOLD}${MAGENTA}║  DEMO RUNNER — MediCare Clinic UAS  ║${R}`);
   console.log(`${BOLD}${MAGENTA}╚══════════════════════════════════════╝${R}`);
-  console.log(`${DIM}  Pastikan server berjalan: npm run dev${R}`);
   console.log(`${DIM}  Email register: ${REG_EMAIL}${R}`);
   console.log(`${DIM}  Tekan Ctrl+C untuk keluar kapan saja\n${R}`);
+
+  // ── Cek server ──
+  process.stdout.write(`  Mengecek server di ${BASE}... `);
+  const serverOk = await checkServer();
+  if (!serverOk) {
+    console.log(`\x1b[31mTIDAK BISA TERHUBUNG\x1b[0m\n`);
+    console.log(`\x1b[33m  Server belum berjalan!\x1b[0m`);
+    console.log(`  Buka terminal baru dan jalankan:\n`);
+    console.log(`\x1b[1m    npm run dev\x1b[0m\n`);
+    console.log(`  Lalu jalankan lagi: npm run demo\n`);
+    process.exit(1);
+  }
+  console.log(`\x1b[32mOK\x1b[0m\n`);
 
   const browser = await chromium.launch({
     headless: false,

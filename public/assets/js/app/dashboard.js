@@ -20,6 +20,16 @@ const Dashboard = (() => {
   const cancelFilter  = { search: '' };
   const doctorFilter  = { search: '' };
 
+  let _apptRefreshTimer = null;
+  function scheduleAppointmentRefresh() {
+    clearTimeout(_apptRefreshTimer);
+    _apptRefreshTimer = setTimeout(async () => {
+      const jobs = [loadStats(), loadAppointments()];
+      if (currentUser?.role === 'admin') jobs.push(loadCancellations());
+      await Promise.all(jobs);
+    }, 200);
+  }
+
   function filterItems(items, search, searchFns, extra = {}) {
     let result = items;
     const q = (search || '').toLowerCase().trim();
@@ -215,11 +225,7 @@ const Dashboard = (() => {
     socket = io({ auth: { token: Api.getToken() } });
 
     ['appointment:created', 'appointment:updated', 'appointment:requested', 'appointment:scheduled', 'appointment:completed', 'appointment:cancelled', 'appointment:deleted'].forEach((eventName) => {
-      socket.on(eventName, async () => {
-        const jobs = [loadStats(), loadAppointments()];
-        if (currentUser.role === 'admin') jobs.push(loadCancellations());
-        await Promise.all(jobs);
-      });
+      socket.on(eventName, () => scheduleAppointmentRefresh());
     });
 
     socket.on('chat:conversationCreated', async () => {
@@ -288,14 +294,18 @@ const Dashboard = (() => {
     if (patientAppointmentForm) {
       patientAppointmentForm.addEventListener('submit', async (event) => {
         event.preventDefault();
+        const btn = patientAppointmentForm.querySelector('[type="submit"]');
+        if (btn) btn.disabled = true;
         try {
           const payload = Api.formToObject(patientAppointmentForm);
           const result = await Api.request('/appointments', { method: 'POST', body: JSON.stringify(payload) });
           patientAppointmentForm.querySelector('[name="symptoms"]').value = '';
-          await Promise.all([loadStats(), loadAppointments()]);
+          scheduleAppointmentRefresh();
           Api.showMessage(dashboardMessage(), result.message, 'success');
         } catch (error) {
           Api.showMessage(dashboardMessage(), error.message, 'error');
+        } finally {
+          if (btn) btn.disabled = false;
         }
       });
     }
@@ -304,6 +314,8 @@ const Dashboard = (() => {
     if (departmentForm) {
       departmentForm.addEventListener('submit', async (event) => {
         event.preventDefault();
+        const btn = departmentForm.querySelector('[type="submit"]');
+        if (btn) btn.disabled = true;
         try {
           await Api.request('/departments', { method: 'POST', body: JSON.stringify(Api.formToObject(departmentForm)) });
           departmentForm.reset();
@@ -311,6 +323,8 @@ const Dashboard = (() => {
           Api.showMessage(dashboardMessage(), 'Poli berhasil ditambahkan.', 'success');
         } catch (error) {
           Api.showMessage(dashboardMessage(), error.message, 'error');
+        } finally {
+          if (btn) btn.disabled = false;
         }
       });
     }
@@ -319,6 +333,8 @@ const Dashboard = (() => {
     if (doctorForm) {
       doctorForm.addEventListener('submit', async (event) => {
         event.preventDefault();
+        const btn = doctorForm.querySelector('[type="submit"]');
+        if (btn) btn.disabled = true;
         try {
           const payload = Api.formToObject(doctorForm);
           payload.createLogin = document.getElementById('createLogin').checked;
@@ -328,6 +344,8 @@ const Dashboard = (() => {
           Api.showMessage(dashboardMessage(), 'Dokter berhasil ditambahkan.', 'success');
         } catch (error) {
           Api.showMessage(dashboardMessage(), error.message, 'error');
+        } finally {
+          if (btn) btn.disabled = false;
         }
       });
     }
@@ -385,7 +403,12 @@ const Dashboard = (() => {
       csInboxTable.addEventListener('click', async (event) => {
         const assignButton = event.target.closest('[data-assign-id]');
         const chatButton = event.target.closest('[data-chat-user]');
-        if (assignButton) await assignAppointment(assignButton.dataset.assignId);
+        if (assignButton) {
+          if (assignButton.disabled) return;
+          assignButton.disabled = true;
+          await assignAppointment(assignButton.dataset.assignId);
+          assignButton.disabled = false;
+        }
         if (chatButton) await openPatientChatFromButton(chatButton.dataset.chatUser);
       });
     }
@@ -401,12 +424,19 @@ const Dashboard = (() => {
       appointmentsTable.addEventListener('click', async (event) => {
         const scheduleButton = event.target.closest('[data-schedule-id]');
         const completeButton = event.target.closest('[data-complete-id]');
-        const cancelButton = event.target.closest('[data-cancel-id]');
-        const chatButton = event.target.closest('[data-chat-user]');
+        const cancelButton   = event.target.closest('[data-cancel-id]');
+        const deleteButton   = event.target.closest('[data-delete-appt-id]');
+        const chatButton     = event.target.closest('[data-chat-user]');
+        const actionBtn = scheduleButton || completeButton || cancelButton || deleteButton;
+        if (actionBtn) {
+          if (actionBtn.disabled) return;
+          actionBtn.disabled = true;
+        }
         if (scheduleButton) await scheduleAppointment(scheduleButton.dataset.scheduleId);
         if (completeButton) await updateAppointmentStatus(completeButton.dataset.completeId, 'completed');
-        if (cancelButton) await updateAppointmentStatus(cancelButton.dataset.cancelId, 'cancelled');
-        if (chatButton) await openPatientChatFromButton(chatButton.dataset.chatUser);
+        if (cancelButton)   await updateAppointmentStatus(cancelButton.dataset.cancelId, 'cancelled');
+        if (deleteButton)   await deleteAppointment(deleteButton.dataset.deleteApptId);
+        if (actionBtn) actionBtn.disabled = false;
       });
     }
   }
@@ -782,7 +812,21 @@ const Dashboard = (() => {
 
   function renderAppointmentAction(item) {
     if (currentUser.role === 'customer_service') return renderChatButton(item);
+    if (currentUser.role === 'admin') {
+      return `<button class="btn btn-outline-danger btn-sm" data-delete-appt-id="${item.id}" title="Hapus appointment"><i class="bi bi-trash"></i></button>`;
+    }
     return '<span class="text-muted">Monitoring</span>';
+  }
+
+  async function deleteAppointment(id) {
+    if (!confirm(`Hapus appointment #${id}? Tindakan ini tidak bisa dibatalkan.`)) return;
+    try {
+      await Api.request(`/appointments/${id}`, { method: 'DELETE' });
+      scheduleAppointmentRefresh();
+      Api.showMessage(dashboardMessage(), `Appointment #${id} berhasil dihapus.`, 'success');
+    } catch (error) {
+      Api.showMessage(dashboardMessage(), error.message, 'error');
+    }
   }
 
   function renderChatButton(item) {
@@ -827,7 +871,7 @@ const Dashboard = (() => {
         method: 'PATCH',
         body: JSON.stringify({ appointmentDate, appointmentTime })
       });
-      await Promise.all([loadStats(), loadAppointments()]);
+      scheduleAppointmentRefresh();
       Api.showMessage(dashboardMessage(), 'Jadwal berhasil dipilih dokter. Status menjadi SCHEDULED.', 'success');
     } catch (error) {
       Api.showMessage(dashboardMessage(), error.message, 'error');
@@ -843,9 +887,7 @@ const Dashboard = (() => {
         payload.cancelReason = reason;
       }
       await Api.request(`/appointments/${id}/status`, { method: 'PATCH', body: JSON.stringify(payload) });
-      const jobs = [loadStats(), loadAppointments()];
-      if (currentUser.role === 'admin') jobs.push(loadCancellations());
-      await Promise.all(jobs);
+      scheduleAppointmentRefresh();
       Api.showMessage(dashboardMessage(), status === 'cancelled' ? 'Appointment dicancel dan alasan masuk ke admin.' : 'Appointment berhasil diselesaikan.', 'success');
     } catch (error) {
       Api.showMessage(dashboardMessage(), error.message, 'error');
@@ -973,7 +1015,7 @@ const Dashboard = (() => {
         method: 'PATCH',
         body: JSON.stringify({ doctorId, departmentId })
       });
-      await Promise.all([loadStats(), loadAppointments()]);
+      scheduleAppointmentRefresh();
       Api.showMessage(dashboardMessage(), 'Appointment dikirim ke dokter. Status menjadi REQUESTED.', 'success');
     } catch (error) {
       Api.showMessage(dashboardMessage(), error.message, 'error');
