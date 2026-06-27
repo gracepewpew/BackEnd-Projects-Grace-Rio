@@ -109,3 +109,21 @@ Login Demo Lainnya:
 Dokumentasi API: https://backend-projects-grace-rio-production.up.railway.app/api-docs
 
 ~~~~
+
+~~~~
+
+ Akun Demo
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@clinic.test | admin12345 |
+| Customer Service | cs@clinic.test | cs12345 |
+| Pasien Demo | pasien@clinic.test | pasien12345 |
+| Dokter | marcus@clinic.test | doctor12345 |
+| Dokter | sarah.williams@clinic.test | doctor12345 |
+| Dokter | michael@clinic.test | doctor12345 |
+| Dokter | emily.rodriguez@clinic.test | doctor12345 |
+| Dokter | david.thompson@clinic.test | doctor12345 |
+| Dokter | lisa.anderson@clinic.test | doctor12345 |
+| Dokter | robert.martinez@clinic.test | doctor12345 |
+| Dokter | jennifer.lee@clinic.test | doctor12345 |
