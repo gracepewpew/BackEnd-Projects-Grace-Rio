@@ -1,6 +1,21 @@
- MediCare Clinic UAS — Real-Time Multi-Role
+# MediCare Clinic UAS
 
 Project UAS berbasis template Clinic-1.0.0 yang dikembangkan menjadi aplikasi web klinik lengkap dengan backend Express.js, REST API, MySQL, authentication, authorization, dashboard role-based, live chat real-time, appointment workflow multi-peran, contact/feedback berkategori, dan adjustable list view pada semua tabel.
+
+ Live Demo (Sudah Online, Tidak Perlu Install Apa pun)
+
+Setiap anggota sudah host aplikasi ini secara terpisah di Railway. Untuk keperluan penilaian, dosen cukup buka salah satu link berikut di browser - tidak perlu install Node.js, MySQL, atau menjalankan perintah apa pun:
+
+| Anggota | Live URL |
+|---|---|
+| Grace Putri Wijaya | https://backend-projects-grace-rio-production.up.railway.app/ |
+| Rio Frederich | https://backend-projects-grace-rio-production-43f9.up.railway.app/ |
+
+Kedua link menjalankan aplikasi dan database yang sama (lihat tabel Akun Demo di bawah untuk login). Halaman login ada di `/login.html` dan dokumentasi API Swagger ada di `/api-docs` (khusus admin) pada masing-masing URL di atas.
+
+> Catatan: Railway free/trial plan bisa membuat aplikasi "tidur" setelah tidak diakses beberapa saat, jadi load pertama mungkin butuh beberapa detik lebih lama.
+
+Bagian di bawah ini (instalasi lokal) hanya diperlukan jika ingin menjalankan atau mengembangkan project dari komputer sendiri, bukan untuk keperluan penilaian.
 
  Fitur Utama
 
@@ -23,10 +38,10 @@ Project UAS berbasis template Clinic-1.0.0 yang dikembangkan menjadi aplikasi we
    - Pasien bisa mengubah data tambahan: tanggal lahir, gender, golongan darah, alamat.
 
 5. Appointment Workflow Multi-Peran (5 Status)
-   - Pasien mengirim nama, No. RM, dan keluhan → status PENDING.
-   - Customer Service memilih poli lalu dokter sesuai poli → status REQUESTED.
-   - Dokter menentukan tanggal dan jam → status SCHEDULED.
-   - Dokter menandai selesai → COMPLETED / CANCELLED.
+   - Pasien mengirim nama, No. RM, dan keluhan -> status `PENDING`.
+   - Customer Service memilih poli lalu dokter sesuai poli -> status `REQUESTED`.
+   - Dokter menentukan tanggal dan jam -> status `SCHEDULED`.
+   - Dokter menandai selesai -> `COMPLETED` / `CANCELLED`.
    - Jika cancel, dokter wajib isi alasan dan tercatat di riwayat admin.
 
 6. Customer Service Dashboard
@@ -61,7 +76,7 @@ Project UAS berbasis template Clinic-1.0.0 yang dikembangkan menjadi aplikasi we
 
 11. Swagger UI Dokumentasi API (Admin Only)
     - Dokumentasi REST API interaktif tersedia di `/api-docs`.
-    - Akses dibatasi hanya untuk role Admin — diproteksi di level server dengan verifikasi JWT.
+    - Akses dibatasi hanya untuk role Admin - diproteksi di level server dengan verifikasi JWT.
     - Role lain (Pasien, Dokter, CS) tidak melihat link API Docs dan akan ditolak jika mengakses langsung.
 
 12. Keamanan Berlapis
@@ -84,17 +99,33 @@ Front-End:
 - HTML, CSS, JavaScript (Vanilla), Bootstrap 5, Socket.IO Client
 - Template: Clinic Bootstrap Template (Clinic-1.0.0)
 
- Cara Menjalankan
+ Menjalankan Secara Lokal (Opsional, untuk Development)
 
- 1. Install dependency
+Semua perintah di bawah ini ditulis untuk terminal PowerShell bawaan VS Code di Windows (buka dengan Ctrl+`). Jalankan dari root folder project.
 
-```bash
+# 1. Install dependency
+
+```powershell
 npm install
 ```
 
- 2. Buat file `.env`
+# 2. Siapkan file `.env` (cukup sekali saja)
 
-Buat file baru bernama `.env` di root project, isi dengan:
+Project ini sudah menyediakan `.env.example` sebagai contoh konfigurasi. File `.env` tidak perlu dibuat ulang setiap kali kamu menjalankan project - cukup buat sekali, lalu Git akan mengabaikannya (lihat `.gitignore`) sehingga file itu tetap ada dan tidak pernah ter-push atau tertimpa.
+
+Cek dulu apakah `.env` sudah ada:
+
+```powershell
+Test-Path .env
+```
+
+Jika hasilnya `False` (belum ada), copy dari contoh lalu jalankan sekali saja:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Isi `.env` (silakan sesuaikan `DB_PASS` dan `JWT_SECRET` sesuai MySQL lokal kamu):
 
 ```env
 PORT=8888
@@ -107,31 +138,43 @@ JWT_SECRET=ganti_dengan_secret_panjang_acak
 JWT_EXPIRES_IN=1d
 ```
 
-> Sesuaikan `DB_PASS` dengan password MySQL lokal. Jika tidak ada password, kosongkan saja.
+> Jika MySQL lokal kamu tidak punya password, biarkan `DB_PASS` kosong. Setelah file ini ada, kamu bisa langsung lanjut ke langkah berikutnya kapan pun tanpa mengulang langkah ini lagi.
 
- 3. Import database
+# 3. Import database
 
-```bash
-mysql -u root < database/database.sql
+```powershell
+Get-Content .\database\database.sql | mysql -u root
 ```
 
-> File SQL sudah berisi perintah `CREATE DATABASE` dan `USE clinic_uas` secara otomatis.
+- Jika root MySQL kamu punya password, tambahkan `-p` lalu masukkan password saat diminta: `Get-Content .\database\database.sql | mysql -u root -p`
+- Jika PowerShell tidak mengenali perintah `mysql`, tambahkan folder `bin` instalasi MySQL (misalnya `C:\Program Files\MySQL\MySQL Server 8.0\bin`) ke PATH Windows, atau import file `database/database.sql` lewat MySQL Workbench/phpMyAdmin.
 
- 4. Jalankan server
+> File SQL sudah berisi perintah `CREATE DATABASE` dan `USE clinic_uas` secara otomatis, jadi tidak perlu membuat database secara manual.
 
-```bash
+# 4. Jalankan server
+
+```powershell
 npm run dev
 ```
 
-Buka browser:
+Buka salah satu URL berikut di browser:
 
-```
-http://localhost:8888          ← halaman utama
-http://localhost:8888/login.html
-http://localhost:8888/api-docs ← Swagger (login admin dulu, link tersedia di dashboard)
-```
+| URL | Keterangan |
+|---|---|
+| http://localhost:8888 | Halaman utama |
+| http://localhost:8888/login.html | Halaman login |
+| http://localhost:8888/api-docs | Swagger (login sebagai admin dulu, link tersedia di dashboard) |
 
 > Database akan di-sync otomatis via Sequelize saat server start. Seed data (akun demo, dokter, poli, pasien) dibuat otomatis jika belum ada.
+
+# Ringkasan alur setup
+
+Setelah langkah 2 (`.env`) selesai sekali, setiap kali ingin menjalankan ulang project kamu hanya perlu:
+
+```powershell
+npm install
+npm run dev
+```
 
  Akun Demo
 
@@ -151,15 +194,27 @@ http://localhost:8888/api-docs ← Swagger (login admin dulu, link tersedia di d
 
  Cara Demo Real-Time
 
-1. Buka Tab 1 → login sebagai `pasien@clinic.test`
-2. Buka Tab 2 → login sebagai `cs@clinic.test`
-3. Buka Tab 3 → login sebagai `marcus@clinic.test`
+1. Buka Tab 1 -> login sebagai `pasien@clinic.test`
+2. Buka Tab 2 -> login sebagai `cs@clinic.test`
+3. Buka Tab 3 -> login sebagai `marcus@clinic.test`
 4. Di tab pasien, buat appointment dari dashboard.
-5. Di tab CS, request muncul langsung di inbox → pilih poli → pilih dokter → klik Kirim ke Dokter. Status: REQUESTED.
-6. Di tab dokter, appointment muncul otomatis → pilih tanggal & jam → klik Jadwalkan. Status: SCHEDULED.
+5. Di tab CS, request muncul langsung di inbox -> pilih poli -> pilih dokter -> klik Kirim ke Dokter. Status: `REQUESTED`.
+6. Di tab dokter, appointment muncul otomatis -> pilih tanggal & jam -> klik Jadwalkan. Status: `SCHEDULED`.
 7. Dokter klik Complete atau Cancel (jika cancel, wajib isi alasan).
-8. Di tab pasien, klik bubble chat kanan bawah → chat dengan CS.
-9. CS mengakhiri chat → Admin bisa lihat history.
+8. Di tab pasien, klik bubble chat kanan bawah -> chat dengan CS.
+9. CS mengakhiri chat -> Admin bisa lihat history.
+
+# Demo otomatis (opsional)
+
+Ada script Playwright yang menjalankan alur demo di atas secara otomatis lewat browser:
+
+```powershell
+npm install
+npx playwright install chromium
+npm run demo
+```
+
+Pastikan server (`npm run dev`) sudah berjalan di port 8888 sebelum menjalankan `npm run demo`. Tekan ENTER di terminal untuk maju ke langkah berikutnya, atau Ctrl+C untuk keluar.
 
  Endpoint REST API Utama
 
@@ -178,8 +233,8 @@ http://localhost:8888/api-docs ← Swagger (login admin dulu, link tersedia di d
 | GET | `/api/patients` | List pasien (admin/CS) |
 | POST | `/api/appointments` | Pasien buat request appointment |
 | GET | `/api/appointments` | List appointment sesuai role |
-| PATCH | `/api/appointments/:id/assign` | CS pilih poli & dokter → REQUESTED |
-| PATCH | `/api/appointments/:id/schedule` | Dokter tentukan tanggal & jam → SCHEDULED |
+| PATCH | `/api/appointments/:id/assign` | CS pilih poli & dokter -> REQUESTED |
+| PATCH | `/api/appointments/:id/schedule` | Dokter tentukan tanggal & jam -> SCHEDULED |
 | PATCH | `/api/appointments/:id/status` | Dokter complete/cancel appointment |
 | GET | `/api/appointments/cancellations` | Admin lihat riwayat cancel (admin) |
 | DELETE | `/api/appointments/:id` | Hapus appointment (admin) |
@@ -197,21 +252,22 @@ http://localhost:8888/api-docs ← Swagger (login admin dulu, link tersedia di d
 
  Pembagian Fitur
 
- Anggota 1 — Rio Frederich (211112075)
+Anggota 1 - Rio Frederich (211112075)
 - Authentication & authorization (JWT, bcrypt).
 - Register/login & profile user.
 - Data pasien & nomor rekam medis.
 - Middleware: auth, role, validation, error handler.
 - Upload foto profile.
+- Hosting di Railway: https://backend-projects-grace-rio-production-43f9.up.railway.app/
 
- Anggota 2 — Grace Putri Wijaya (211110121)
+Anggota 2 - Grace Putri Wijaya (211110121)
 - Appointment workflow multi-peran (5 status).
 - Customer Service dashboard & inbox.
 - Live chat real-time (Socket.IO).
 - Data dokter dan poli.
 - Contact/feedback berkategori.
 - Adjustable list view & dashboard admin.
-- Hosting di Railway.
+- Hosting di Railway: https://backend-projects-grace-rio-production.up.railway.app/
 
  Catatan
 
